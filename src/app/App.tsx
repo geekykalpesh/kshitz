@@ -1,7 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Menu } from 'lucide-react';
 import { ImageWithFallback } from './components/figma/ImageWithFallback';
 import { Marquee } from './components/Marquee';
+import { BackgroundRippleEffect } from './components/ui/background-ripple-effect';
+
+import { motion } from 'motion/react';
 
 interface WorkItem {
   id: number;
@@ -145,94 +148,185 @@ export default function App() {
     ? verticalVideos
     : verticalVideos.filter(item => item.tags.some(tag => activeFilters.includes(tag)));
 
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   return (
-    <div className="min-h-screen bg-white">
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-black/10">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            <a href="#" className="group flex items-center gap-3">
-              <div className="relative">
-                <div className="w-10 h-10 bg-black border-2 border-black flex items-center justify-center transition-all group-hover:bg-white">
-                  <span className="font-bold text-white group-hover:text-black transition-colors">K</span>
-                </div>
-              </div>
-              <div className="flex flex-col">
-                <span className="font-semibold tracking-wide text-black">KSHITIJ RATHORE</span>
-                <span className="text-xs tracking-widest text-black/60 uppercase">Visual Artist</span>
-              </div>
-            </a>
-            <div className="hidden md:flex items-center gap-8 lg:gap-12">
-              <a href="#works" className="relative group py-2">
-                <span className="text-black font-medium">Works</span>
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all group-hover:w-full"></span>
-              </a>
-              <a href="#about" className="relative group py-2">
-                <span className="text-black font-medium">About</span>
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all group-hover:w-full"></span>
-              </a>
-              <a href="#contact" className="relative group py-2">
-                <span className="text-black font-medium">Contact</span>
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all group-hover:w-full"></span>
-              </a>
-              <a href="#contact" className="px-6 py-2.5 bg-black text-white border-2 border-black hover:bg-white hover:text-black transition-all duration-300">
-                Let's Talk
-              </a>
+    <div className="min-h-screen bg-white text-black font-sans selection:bg-black selection:text-white">
+      {/* Navigation */}
+      <nav className="fixed top-0 left-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-black/5">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 h-20 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-black text-white flex items-center justify-center font-bold text-xl">K</div>
+            <div>
+              <h1 className="text-sm font-bold tracking-widest leading-none uppercase">Kshitij Rathore</h1>
+              <p className="text-[10px] uppercase tracking-widest opacity-40 mt-1">Visual Artist</p>
             </div>
-            <button className="md:hidden p-2">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
           </div>
+
+          {/* Desktop Menu */}
+          <div className="hidden md:flex items-center gap-8">
+            <a href="#works" className="text-xs font-bold uppercase tracking-widest hover:text-black/60 transition-colors">Works</a>
+            <a href="#about" className="text-xs font-bold uppercase tracking-widest hover:text-black/60 transition-colors">About</a>
+            <a href="#contact" className="text-xs font-bold uppercase tracking-widest hover:text-black/60 transition-colors">Contact</a>
+            <a href="#contact" className="px-6 py-2.5 bg-black text-white text-xs font-bold uppercase tracking-widest hover:bg-neutral-800 transition-colors">
+              Let's Talk
+            </a>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <button 
+            className="md:hidden p-2 text-black"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
         </div>
+
+        {/* Mobile Menu Overlay */}
+        {isMenuOpen && (
+          <div className="md:hidden fixed inset-0 top-20 bg-white z-40 flex flex-col p-6 space-y-8 animate-in fade-in slide-in-from-top-4 duration-300 h-screen">
+            <a 
+              href="#works" 
+              className="text-2xl font-light uppercase tracking-widest border-b border-black/5 pb-4"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Works
+            </a>
+            <a 
+              href="#about" 
+              className="text-2xl font-light uppercase tracking-widest border-b border-black/5 pb-4"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              About
+            </a>
+            <a 
+              href="#contact" 
+              className="text-2xl font-light uppercase tracking-widest border-b border-black/5 pb-4"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Contact
+            </a>
+            <a 
+              href="#contact" 
+              className="w-full py-4 bg-black text-white text-center text-xs font-bold uppercase tracking-widest"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Let's Talk
+            </a>
+          </div>
+        )}
       </nav>
 
-      <section className="relative pt-48 pb-32 px-6 lg:px-8 bg-white overflow-hidden">
-        {/* Architectural Background Marker */}
-        <div className="absolute top-20 -right-12 text-[20rem] font-bold text-neutral-100/80 pointer-events-none select-none tracking-tighter leading-none">
-          KR
-        </div>
-
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-16">
-            <div className="space-y-8">
-              <p className="uppercase tracking-[0.4em] text-[10px] font-bold text-black/60 flex items-center gap-4">
-                <span className="w-12 h-[1px] bg-black/30"></span>
-                Editor · Colorist · Motion · DOP
-              </p>
-              <div className="space-y-2">
-                <h1 className="text-7xl md:text-[11rem] font-bold tracking-tighter leading-[0.8] text-black">
-                  KSHITIJ
-                </h1>
-                <h1 className="text-7xl md:text-[11rem] font-bold tracking-tighter leading-[0.8] text-neutral-400">
-                  RATHORE
-                </h1>
+      <BackgroundRippleEffect 
+        rows={14} 
+        cols={30}
+        className="relative min-h-screen px-6 lg:px-8 bg-white overflow-hidden flex items-center justify-center pt-28 pb-20"
+      >
+        <div className="max-w-7xl mx-auto relative z-10 flex flex-col items-center text-center">
+          <div className="space-y-12 w-full">
+            <motion.p 
+              initial={{ opacity: 0, letterSpacing: "0.2em" }}
+              animate={{ opacity: 0.6, letterSpacing: "0.4em" }}
+              transition={{ duration: 1.5, ease: "easeOut" }}
+              className="uppercase tracking-[0.4em] text-[10px] font-bold text-black flex items-center justify-center gap-6"
+            >
+              <motion.span 
+                initial={{ width: 0 }}
+                animate={{ width: 48 }}
+                transition={{ duration: 1, delay: 0.5 }}
+                className="h-[1px] bg-black/20"
+              ></motion.span>
+              Editor · Colorist · Motion · DOP
+              <motion.span 
+                initial={{ width: 0 }}
+                animate={{ width: 48 }}
+                transition={{ duration: 1, delay: 0.5 }}
+                className="h-[1px] bg-black/20"
+              ></motion.span>
+            </motion.p>
+                       <div className="space-y-4">
+              <div className="flex flex-col items-center">
+                <div className="flex overflow-hidden pb-2">
+                  {"KSHITIJ".split("").map((char, i) => (
+                    <motion.span
+                      key={i}
+                      initial={{ opacity: 0, filter: "blur(10px)", y: 20, scale: 0.8 }}
+                      animate={{ opacity: 1, filter: "blur(0px)", y: 0, scale: 1 }}
+                      transition={{
+                        duration: 0.4,
+                        delay: i * 0.05,
+                        ease: [0.2, 0.65, 0.3, 0.9]
+                      }}
+                      className="text-6xl md:text-[8rem] font-bold tracking-tighter leading-none text-black inline-block"
+                    >
+                      {char}
+                    </motion.span>
+                  ))}
+                </div>
+                <div className="flex overflow-hidden">
+                  {"RATHORE".split("").map((char, i) => (
+                    <motion.span
+                      key={i}
+                      initial={{ opacity: 0, filter: "blur(10px)", y: 20, scale: 0.8 }}
+                      animate={{ opacity: 1, filter: "blur(0px)", y: 0, scale: 1 }}
+                      transition={{
+                        duration: 0.4,
+                        delay: 0.3 + i * 0.05,
+                        ease: [0.2, 0.65, 0.3, 0.9]
+                      }}
+                      className="text-6xl md:text-[8rem] font-bold tracking-tighter leading-none text-neutral-400 inline-block"
+                    >
+                      {char}
+                    </motion.span>
+                  ))}
+                </div>
               </div>
             </div>
 
-            <div className="max-w-md space-y-12">
-              <p className="text-xl md:text-2xl font-light text-black/80 leading-tight tracking-tight">
-                Mumbai-based creative crafting visual stories for the <span className="text-black font-medium border-b-2 border-black/10">biggest names</span> in Indian and global entertainment.
-              </p>
-              <div className="flex flex-wrap gap-6">
-                <a 
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1.2, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className="max-w-3xl mx-auto space-y-12"
+            >
+              <motion.p 
+                animate={{ 
+                  y: [0, -5, 0],
+                }}
+                transition={{
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+                className="text-xl md:text-3xl font-light text-black/80 leading-tight tracking-tight px-4"
+              >
+                Mumbai-based creative crafting visual stories for the <br className="hidden md:block" />
+                <span className="text-black font-medium border-b-2 border-black/10">biggest names</span> in Indian and global entertainment.
+              </motion.p>
+              
+              <div className="flex flex-wrap items-center justify-center gap-6">
+                <motion.a 
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   href="#works" 
-                  className="group relative px-10 py-5 bg-black text-white text-[11px] font-bold uppercase tracking-[0.2em] overflow-hidden transition-all duration-500 hover:pr-14"
+                  className="group relative px-12 py-5 bg-black text-white text-[11px] font-bold uppercase tracking-[0.2em] overflow-hidden transition-all duration-500 hover:pr-16"
                 >
                   <span className="relative z-10">Explore Works</span>
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300">→</span>
-                </a>
-                <a 
+                  <span className="absolute right-6 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300">→</span>
+                </motion.a>
+                <motion.a 
+                  whileHover={{ scale: 1.02, backgroundColor: "rgba(0,0,0,0.02)" }}
+                  whileTap={{ scale: 0.98 }}
                   href="#contact" 
-                  className="px-10 py-5 border border-black/10 text-[11px] font-bold uppercase tracking-[0.2em] text-black hover:bg-neutral-50 transition-all duration-300"
+                  className="px-12 py-5 border border-black/10 text-[11px] font-bold uppercase tracking-[0.2em] text-black hover:bg-neutral-50 transition-all duration-300"
                 >
                   Get in touch
-                </a>
+                </motion.a>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
-      </section>
+      </BackgroundRippleEffect>
 
       <Marquee />
 
@@ -312,11 +406,11 @@ export default function App() {
           </div>
 
           {filteredWorkItems.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 border-l border-t border-black/10">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0">
               {filteredWorkItems.map((item) => (
                 <div 
                   key={item.id} 
-                  className="group cursor-pointer border-r border-b border-black/10"
+                  className="group cursor-pointer"
                   onClick={() => setPlayingItem(item)}
                 >
                   <div className="relative aspect-video overflow-hidden bg-neutral-200">
@@ -353,11 +447,11 @@ export default function App() {
           </h2>
           
           {filteredVerticalVideos.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-0 border-l border-t border-black/10">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-0">
               {filteredVerticalVideos.map((item) => (
                 <div 
                   key={item.id} 
-                  className="group cursor-pointer w-full border-r border-b border-black/10"
+                  className="group cursor-pointer w-full"
                   onClick={() => setPlayingItem(item)}
                 >
                   <div className="relative aspect-[9/16] overflow-hidden bg-neutral-200">
