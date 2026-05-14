@@ -187,31 +187,49 @@ export default function App() {
         </div>
       </nav>
 
-      <section className="pt-32 pb-20 px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="space-y-2">
-            <p className="uppercase tracking-widest opacity-60">Editor · Colorist · Motion · DOP</p>
-            <div className="space-y-1">
-              <h1 className="tracking-tight leading-none">KSHITIJ</h1>
-              <h1 className="tracking-tight leading-none">RATHORE</h1>
+      <section className="relative pt-48 pb-32 px-6 lg:px-8 bg-white overflow-hidden">
+        {/* Architectural Background Marker */}
+        <div className="absolute top-20 -right-12 text-[20rem] font-bold text-neutral-100/80 pointer-events-none select-none tracking-tighter leading-none">
+          KR
+        </div>
+
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-16">
+            <div className="space-y-8">
+              <p className="uppercase tracking-[0.4em] text-[10px] font-bold text-black/60 flex items-center gap-4">
+                <span className="w-12 h-[1px] bg-black/30"></span>
+                Editor · Colorist · Motion · DOP
+              </p>
+              <div className="space-y-2">
+                <h1 className="text-7xl md:text-[11rem] font-bold tracking-tighter leading-[0.8] text-black">
+                  KSHITIJ
+                </h1>
+                <h1 className="text-7xl md:text-[11rem] font-bold tracking-tighter leading-[0.8] text-neutral-400">
+                  RATHORE
+                </h1>
+              </div>
             </div>
-          </div>
-          <p className="mt-8 max-w-3xl opacity-80">
-            Mumbai-based creative crafting visual stories for the biggest names in Indian and global entertainment.
-          </p>
-          <div className="mt-10 flex flex-wrap gap-4">
-            <a 
-              href="#works" 
-              className="px-8 py-4 bg-black text-white font-medium hover:bg-neutral-800 transition-all duration-300 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
-            >
-              View More
-            </a>
-            <a 
-              href="#contact" 
-              className="px-8 py-4 border-2 border-black text-black font-medium hover:bg-black hover:text-white transition-all duration-300 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
-            >
-              Contact
-            </a>
+
+            <div className="max-w-md space-y-12">
+              <p className="text-xl md:text-2xl font-light text-black/80 leading-tight tracking-tight">
+                Mumbai-based creative crafting visual stories for the <span className="text-black font-medium border-b-2 border-black/10">biggest names</span> in Indian and global entertainment.
+              </p>
+              <div className="flex flex-wrap gap-6">
+                <a 
+                  href="#works" 
+                  className="group relative px-10 py-5 bg-black text-white text-[11px] font-bold uppercase tracking-[0.2em] overflow-hidden transition-all duration-500 hover:pr-14"
+                >
+                  <span className="relative z-10">Explore Works</span>
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300">→</span>
+                </a>
+                <a 
+                  href="#contact" 
+                  className="px-10 py-5 border border-black/10 text-[11px] font-bold uppercase tracking-[0.2em] text-black hover:bg-neutral-50 transition-all duration-300"
+                >
+                  Get in touch
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -221,7 +239,10 @@ export default function App() {
 
       <section id="works" className="py-20 bg-neutral-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between mb-12">
-          <h2>Featured Works</h2>
+          <h2 className="text-3xl font-light tracking-tight text-black flex items-center gap-4">
+            <span className="text-[10px] leading-none font-bold p-1.5 bg-black text-white">01</span>
+            SELECTED WORKS
+          </h2>
           <div className="flex gap-4">
             <button 
               onClick={() => scroll('left')}
@@ -268,49 +289,34 @@ export default function App() {
         </div>
       </section>
 
-      {filteredWorkItems.length > 0 && (
-        <section className="py-20 px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto">
-            <div className="flex items-center justify-between mb-12">
-              <h2>All Works</h2>
-              <div className="flex gap-4 flex-wrap">
+      <section className="py-20 px-6 lg:px-8 border-t border-black/5">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-8">
+            <h2 className="text-3xl font-light tracking-tight text-black flex items-center gap-4">
+              <span className="text-[10px] leading-none font-bold p-1.5 bg-black text-white">02</span>
+              CREATIVE ARCHIVE
+            </h2>
+            <div className="flex gap-3 flex-wrap">
+              {['all', 'editor', 'colorist', 'motion', 'dop'].map((filter) => (
                 <button
-                  onClick={() => toggleFilter('all')}
-                  className={`px-4 py-2 border border-black transition-colors ${activeFilters.includes('all') ? 'bg-black text-white' : 'hover:bg-neutral-100'}`}
+                  key={filter}
+                  onClick={() => toggleFilter(filter)}
+                  className={`px-5 py-2.5 border border-black text-xs font-bold uppercase tracking-widest transition-all ${
+                    activeFilters.includes(filter) ? 'bg-black text-white' : 'hover:bg-neutral-100'
+                  }`}
                 >
-                  all
+                  {filter === 'all' ? 'All' : filter === 'dop' ? 'DOP' : filter.charAt(0).toUpperCase() + filter.slice(1)}
                 </button>
-                <button
-                  onClick={() => toggleFilter('editor')}
-                  className={`px-4 py-2 border border-black transition-colors ${activeFilters.includes('editor') ? 'bg-black text-white' : 'hover:bg-neutral-100'}`}
-                >
-                  editor
-                </button>
-                <button
-                  onClick={() => toggleFilter('colorist')}
-                  className={`px-4 py-2 border border-black transition-colors ${activeFilters.includes('colorist') ? 'bg-black text-white' : 'hover:bg-neutral-100'}`}
-                >
-                  colorist
-                </button>
-                <button
-                  onClick={() => toggleFilter('motion')}
-                  className={`px-4 py-2 border border-black transition-colors ${activeFilters.includes('motion') ? 'bg-black text-white' : 'hover:bg-neutral-100'}`}
-                >
-                  motion
-                </button>
-                <button
-                  onClick={() => toggleFilter('dop')}
-                  className={`px-4 py-2 border border-black transition-colors ${activeFilters.includes('dop') ? 'bg-black text-white' : 'hover:bg-neutral-100'}`}
-                >
-                  dop
-                </button>
-              </div>
+              ))}
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0">
+          </div>
+
+          {filteredWorkItems.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 border-l border-t border-black/10">
               {filteredWorkItems.map((item) => (
                 <div 
                   key={item.id} 
-                  className="group cursor-pointer"
+                  className="group cursor-pointer border-r border-b border-black/10"
                   onClick={() => setPlayingItem(item)}
                 >
                   <div className="relative aspect-video overflow-hidden bg-neutral-200">
@@ -331,19 +337,27 @@ export default function App() {
                 </div>
               ))}
             </div>
-          </div>
-        </section>
-      )}
+          ) : (
+            <div className="py-20 text-center border border-dashed border-black/10">
+              <p className="text-black/40 uppercase tracking-[0.2em] text-xs font-bold">No horizontal works found for this selection.</p>
+            </div>
+          )}
+        </div>
+      </section>
 
-      {filteredVerticalVideos.length > 0 && (
-        <section className="py-20 px-6 lg:px-8 bg-neutral-50">
-          <div className="max-w-7xl mx-auto">
-            <h2 className="mb-12">Vertical Videos</h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-0">
+      <section className="py-20 px-6 lg:px-8 bg-neutral-50 border-t border-black/5">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="mb-12 text-3xl font-light tracking-tight text-black flex items-center gap-4">
+            <span className="text-[10px] leading-none font-bold p-1.5 bg-black text-white">03</span>
+            PORTRAIT CINEMA
+          </h2>
+          
+          {filteredVerticalVideos.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-0 border-l border-t border-black/10">
               {filteredVerticalVideos.map((item) => (
                 <div 
                   key={item.id} 
-                  className="group cursor-pointer w-full"
+                  className="group cursor-pointer w-full border-r border-b border-black/10"
                   onClick={() => setPlayingItem(item)}
                 >
                   <div className="relative aspect-[9/16] overflow-hidden bg-neutral-200">
@@ -364,9 +378,13 @@ export default function App() {
                 </div>
               ))}
             </div>
-          </div>
-        </section>
-      )}
+          ) : (
+            <div className="py-20 text-center border border-dashed border-black/10">
+              <p className="text-black/40 uppercase tracking-[0.2em] text-xs font-bold">No vertical works found for this selection.</p>
+            </div>
+          )}
+        </div>
+      </section>
 
       {/* Video Modal */}
       {playingItem && (
@@ -395,12 +413,31 @@ export default function App() {
         </div>
       )}
 
-      <section id="about" className="py-20 px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="mb-8">ABOUT</h2>
-          <p className="opacity-80 leading-relaxed">
-            With over a decade of experience in the film and entertainment industry, I bring a unique blend of technical expertise and creative vision to every project. From editing to color grading, motion graphics to cinematography, I've worked across diverse formats and genres, delivering compelling visual narratives for leading brands and production houses.
-          </p>
+      <section id="about" className="py-32 px-6 lg:px-8 border-t border-black/5 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-24">
+            <div className="space-y-12">
+              <h2 className="text-3xl font-light tracking-tight text-black flex items-center gap-4">
+                <span className="text-[10px] leading-none font-bold p-1.5 bg-black text-white">04</span>
+                ABOUT
+              </h2>
+              <p className="text-4xl md:text-5xl font-light tracking-tight leading-[1.1] text-black">
+                Mumbai-based creative with a sharp eye for storytelling through <span className="italic">motion</span> and <span className="italic font-medium bg-gradient-to-r from-blue-600 via-purple-500 to-orange-500 bg-clip-text text-transparent">color</span>.
+              </p>
+            </div>
+            <div className="flex flex-col justify-end space-y-10">
+              <p className="text-xl text-black/70 leading-relaxed max-w-xl">
+                Specialising in high-impact promos, brand films, and social content for OTT platforms, Bollywood productions, and global brands. With over a decade of experience, I bring a unique blend of technical expertise and creative vision to every project.
+              </p>
+              <div className="flex flex-wrap gap-4">
+                {['OTT Promos', 'Bollywood', 'Brand Films', 'Color Grading', 'Motion Graphics', 'Cinematography'].map((skill) => (
+                  <span key={skill} className="px-5 py-2.5 bg-black text-white text-[11px] font-bold uppercase tracking-[0.2em] transition-all hover:bg-neutral-800 cursor-default">
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
