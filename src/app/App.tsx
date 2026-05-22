@@ -9,6 +9,7 @@ import { motion } from 'motion/react';
 interface WorkItem {
   id: number;
   image: string;
+  fallbackSrc?: string[];
   title: string;
   tags: string[];
   category: string;
@@ -72,13 +73,42 @@ export default function App() {
               return values[idx]?.replace(/^"|"$/g, '').trim() || '';
             };
 
+            const videoLink = getVal('video_link');
             const rawImageUrl = getVal('image_thumbnail_link');
-            let imageUrl = rawImageUrl || `https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=1080`;
+
+            // 1. Detect if it's a YouTube video and extract the ID
+            let youtubeId = '';
+            if (videoLink.includes('youtube.com') || videoLink.includes('youtu.be')) {
+              if (videoLink.includes('shorts/')) {
+                youtubeId = videoLink.split('shorts/')[1]?.split(/[?#&]/)[0] || '';
+              } else {
+                const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+                const match = videoLink.match(regExp);
+                youtubeId = match && match[2].length === 11 ? match[2] : '';
+              }
+            }
+
+            // 2. Setup fallbacks list
+            const fallbacks: string[] = [];
+            if (youtubeId) {
+              fallbacks.push(`https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`);
+              fallbacks.push(`https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`);
+            } else if (videoLink.includes('instagram.com')) {
+              // Instagram/Reel aesthetic high-contrast camera lens placeholder
+              fallbacks.push('https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1080');
+            }
+            // General movie slate as final fallback
+            fallbacks.push('https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=1080');
+
+            // 3. Determine the primary imageUrl
+            let imageUrl = rawImageUrl;
             
-            if (imageUrl.includes('drive.google.com')) {
+            // If primary is empty, use the first fallback from our list
+            if (!imageUrl) {
+              imageUrl = fallbacks[0];
+            } else if (imageUrl.includes('drive.google.com')) {
               const fileId = imageUrl.match(/\/file\/d\/([^/?]+)/)?.[1] || imageUrl.match(/id=([^&?]+)/)?.[1];
               if (fileId) {
-                // Using the thumbnail endpoint is often more reliable for direct embeds
                 imageUrl = `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
               }
             }
@@ -89,8 +119,9 @@ export default function App() {
             return {
               id: index + 1,
               title: getVal('title'),
-              videoLink: getVal('video_link'),
+              videoLink: videoLink,
               image: imageUrl,
+              fallbackSrc: fallbacks,
               tags: getVal('tags').split(',').map(t => t.trim().toLowerCase()).filter(t => t),
               category: getVal('category').toUpperCase(),
               featured: isFeatured
@@ -365,6 +396,7 @@ export default function App() {
                 <div className="relative aspect-video overflow-hidden bg-neutral-200">
                   <ImageWithFallback
                     src={item.image}
+                    fallbackSrc={item.fallbackSrc}
                     alt={item.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   />
@@ -416,6 +448,7 @@ export default function App() {
                   <div className="relative aspect-video overflow-hidden bg-neutral-200">
                     <ImageWithFallback
                       src={item.image}
+                      fallbackSrc={item.fallbackSrc}
                       alt={item.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />
@@ -457,6 +490,7 @@ export default function App() {
                   <div className="relative aspect-[9/16] overflow-hidden bg-neutral-200">
                     <ImageWithFallback
                       src={item.image}
+                      fallbackSrc={item.fallbackSrc}
                       alt={item.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />
