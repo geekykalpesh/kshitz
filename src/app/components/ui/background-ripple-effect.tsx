@@ -71,15 +71,15 @@ export const BackgroundRippleEffect = ({
         @keyframes ripple-animation {
           0% {
             background-color: transparent;
-            opacity: 0.1;
+            opacity: 0.3;
           }
           20% {
-            background-color: rgba(0, 0, 0, 0.1);
+            background-color: rgba(0, 0, 0, 0.08);
             opacity: 1;
           }
           100% {
             background-color: transparent;
-            opacity: 0.1;
+            opacity: 0.3;
           }
         }
         .animate-ripple {
@@ -126,7 +126,7 @@ const DivGrid = ({
           <div
             key={`${r}-${c}`}
             className={cn(
-              "border-[0.5px] border-black/10 opacity-10 transition-all duration-300",
+              "border-[0.5px] border-black/15 opacity-30 transition-all duration-300",
               clickedCell && "animate-ripple"
             )}
             style={{

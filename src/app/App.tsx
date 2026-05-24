@@ -40,6 +40,12 @@ export default function App() {
       const baseUrl = url.split('?')[0];
       return baseUrl.endsWith('/') ? `${baseUrl}embed` : `${baseUrl}/embed`;
     }
+    if (url.includes('drive.google.com')) {
+      const fileId = url.match(/\/file\/d\/([^/?]+)/)?.[1] || url.match(/id=([^&?]+)/)?.[1];
+      if (fileId) {
+        return `https://drive.google.com/file/d/${fileId}/preview`;
+      }
+    }
     return url;
   };
 
@@ -96,6 +102,11 @@ export default function App() {
             } else if (videoLink.includes('instagram.com')) {
               // Instagram/Reel aesthetic high-contrast camera lens placeholder
               fallbacks.push('https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1080');
+            } else if (videoLink.includes('drive.google.com')) {
+              const fileId = videoLink.match(/\/file\/d\/([^/?]+)/)?.[1] || videoLink.match(/id=([^&?]+)/)?.[1];
+              if (fileId) {
+                fallbacks.push(`https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`);
+              }
             }
             // General movie slate as final fallback
             fallbacks.push('https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=1080');
@@ -575,22 +586,20 @@ export default function App() {
             <h2 className="mb-8 text-white">Get In Touch</h2>
             <div className="space-y-3">
               <p>
-                <a href="mailto:hello@kshitijrathore.com" className="hover:opacity-70 transition-opacity">
-                  hello@kshitijrathore.com
+                <a href="mailto:kshitizfx@gmail.com" className="hover:opacity-70 transition-opacity">
+                  kshitizfx@gmail.com
                 </a>
               </p>
               <p>
-                <a href="tel:+919876543210" className="hover:opacity-70 transition-opacity">
-                  +91 98765 43210
+                <a href="tel:+919039735357" className="hover:opacity-70 transition-opacity">
+                  +91 90397 35357
                 </a>
               </p>
             </div>
           </div>
           <div className="flex justify-center gap-8 flex-wrap">
-            <a href="#" className="hover:opacity-70 transition-opacity">Instagram</a>
-            <a href="#" className="hover:opacity-70 transition-opacity">LinkedIn</a>
-            <a href="#" className="hover:opacity-70 transition-opacity">WhatsApp</a>
-            <a href="#" className="hover:opacity-70 transition-opacity">Twitter</a>
+            <a href="https://www.instagram.com/kshitizfx/" target="_blank" rel="noopener noreferrer" className="hover:opacity-70 transition-opacity">Instagram</a>
+            <a href="https://www.linkedin.com/in/kshitizfx/" target="_blank" rel="noopener noreferrer" className="hover:opacity-70 transition-opacity">LinkedIn</a>
           </div>
           <div className="mt-12 pt-8 border-t border-white/20 text-center opacity-60">
             <p>&copy; 2026 Kshitij Rathore. All rights reserved.</p>
