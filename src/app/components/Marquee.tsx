@@ -28,7 +28,7 @@ export function Marquee() {
   return (
     <div className="relative overflow-hidden bg-white py-6 md:py-8 border-y border-black/5 flex flex-col justify-center">
       <div className="mb-4 text-center">
-        <h3 className="text-sm font-bold tracking-widest uppercase text-black/60">Trusted By & Collaborated With</h3>
+        <h3 className="text-sm font-bold tracking-widest uppercase text-black/60">Selected Clients & Collaborations</h3>
       </div>
       
       <div className="relative flex overflow-hidden py-0">
