@@ -165,7 +165,7 @@ export default function App() {
               fallbackSrc: fallbacks,
               tags: getVal('tags').split(',').map(t => {
                 const cleaned = t.trim().toLowerCase();
-                return cleaned === 'dop' ? 'cinematography' : cleaned;
+                return cleaned === 'cinematography' ? 'dop' : cleaned;
               }).filter(t => t),
               category: getVal('category').toUpperCase(),
               featured: isFeatured
@@ -260,7 +260,7 @@ export default function App() {
     ? verticalVideos
     : verticalVideos.filter(item => item.tags.some(tag => activeFilters.includes(tag)));
 
-  const cinematographyWorks = data.filter(item => item.category === 'HORIZONTAL' && item.tags.includes('cinematography'));
+  const cinematographyWorks = data.filter(item => item.category === 'HORIZONTAL' && item.tags.includes('dop'));
 
   const filteredCinematographyWorks = activeFilters.includes('all')
     ? cinematographyWorks
@@ -297,14 +297,14 @@ export default function App() {
               </h2>
             </div>
             <div className="flex gap-3 flex-wrap">
-              {['all', 'editor', 'colorist', 'motion', 'cinematography'].map((filter) => (
+              {['all', 'editor', 'colorist', 'motion', 'dop'].map((filter) => (
                 <button
                   key={filter}
                   onClick={() => toggleFilter(filter)}
                   className={`px-5 py-2.5 border border-black text-xs font-bold uppercase tracking-widest transition-all cursor-pointer ${activeFilters.includes(filter) ? 'bg-black text-white' : 'hover:bg-neutral-100'
                     }`}
                 >
-                  {filter === 'all' ? 'All' : filter === 'cinematography' ? 'Cinematography' : filter.charAt(0).toUpperCase() + filter.slice(1)}
+                  {filter === 'all' ? 'All' : filter === 'dop' ? 'DOP' : filter.charAt(0).toUpperCase() + filter.slice(1)}
                 </button>
               ))}
             </div>
@@ -405,14 +405,14 @@ export default function App() {
               </h2>
             </div>
             <div className="flex gap-3 flex-wrap">
-              {['all', 'editor', 'colorist', 'motion', 'cinematography'].map((filter) => (
+              {['all', 'editor', 'colorist', 'motion', 'dop'].map((filter) => (
                 <button
                   key={filter}
                   onClick={() => toggleFilter(filter)}
                   className={`px-5 py-2.5 border border-black text-xs font-bold uppercase tracking-widest transition-all cursor-pointer ${activeFilters.includes(filter) ? 'bg-black text-white' : 'hover:bg-neutral-100'
                     }`}
                 >
-                  {filter === 'all' ? 'All' : filter === 'cinematography' ? 'Cinematography' : filter.charAt(0).toUpperCase() + filter.slice(1)}
+                  {filter === 'all' ? 'All' : filter === 'dop' ? 'DOP' : filter.charAt(0).toUpperCase() + filter.slice(1)}
                 </button>
               ))}
             </div>
@@ -512,14 +512,14 @@ export default function App() {
               </h2>
             </div>
             <div className="flex gap-3 flex-wrap">
-              {['all', 'editor', 'colorist', 'motion', 'cinematography'].map((filter) => (
+              {['all', 'editor', 'colorist', 'motion', 'dop'].map((filter) => (
                 <button
                   key={filter}
                   onClick={() => toggleFilter(filter)}
                   className={`px-5 py-2.5 border border-black text-xs font-bold uppercase tracking-widest transition-all cursor-pointer ${activeFilters.includes(filter) ? 'bg-black text-white' : 'hover:bg-neutral-100'
                     }`}
                 >
-                  {filter === 'all' ? 'All' : filter === 'cinematography' ? 'Cinematography' : filter.charAt(0).toUpperCase() + filter.slice(1)}
+                  {filter === 'all' ? 'All' : filter === 'dop' ? 'DOP' : filter.charAt(0).toUpperCase() + filter.slice(1)}
                 </button>
               ))}
             </div>
@@ -883,14 +883,14 @@ export default function App() {
               All
             </h2>
             <div className="flex gap-3 flex-wrap">
-              {['all', 'editor', 'colorist', 'motion', 'cinematography'].map((filter) => (
+              {['all', 'editor', 'colorist', 'motion', 'dop'].map((filter) => (
                 <button
                   key={filter}
                   onClick={() => toggleFilter(filter)}
                   className={`px-5 py-2.5 border border-black text-xs font-bold uppercase tracking-widest transition-all ${activeFilters.includes(filter) ? 'bg-black text-white' : 'hover:bg-neutral-100'
                     }`}
                 >
-                  {filter === 'all' ? 'All' : filter === 'cinematography' ? 'Cinematography' : filter.charAt(0).toUpperCase() + filter.slice(1)}
+                  {filter === 'all' ? 'All' : filter === 'dop' ? 'DOP' : filter.charAt(0).toUpperCase() + filter.slice(1)}
                 </button>
               ))}
             </div>
@@ -1096,13 +1096,6 @@ export default function App() {
               <p className="text-xl text-black/70 leading-relaxed max-w-xl">
                 Spending most of my time turning ideas into moving images, shooting them, editing them, grading them, and occasionally losing sleep over tiny creative decisions. Worth it every time.
               </p>
-              <div className="flex flex-wrap gap-4">
-                {['OTT Promos', 'Bollywood', 'Brand Films', 'Color Grading', 'Motion Graphics', 'Cinematography'].map((skill) => (
-                  <span key={skill} className="px-5 py-2.5 bg-black text-white text-[11px] font-bold uppercase tracking-[0.2em] transition-all hover:bg-neutral-800 cursor-default">
-                    {skill}
-                  </span>
-                ))}
-              </div>
             </div>
           </div>
         </div>
