@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, X, Menu } from 'lucide-react';
 import { ImageWithFallback } from './components/figma/ImageWithFallback';
 import { Marquee } from './components/Marquee';
-import heroBg from '@/assets/hero-bg.mp4';
 
 import { motion } from 'motion/react';
 
@@ -710,7 +709,7 @@ export default function App() {
           playsInline
           className="absolute inset-0 w-full h-full object-cover pointer-events-none z-0"
         >
-          <source src={heroBg} type="video/mp4" />
+          <source src="https://res.cloudinary.com/dvbarr6ni/video/upload/v1780090126/hero-bg_jxvbup.mp4" type="video/mp4" />
         </video>
 
         {/* Cinematic dark overlay to make text and buttons pop beautifully */}
