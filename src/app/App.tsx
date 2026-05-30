@@ -1,7 +1,18 @@
 import { useState, useRef, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, X, Menu } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Menu, Film } from 'lucide-react';
 import { ImageWithFallback } from './components/figma/ImageWithFallback';
 import { Marquee } from './components/Marquee';
+import {
+  Navbar,
+  NavBody,
+  NavItems,
+  MobileNav,
+  NavbarLogo,
+  NavbarButton,
+  MobileNavHeader,
+  MobileNavToggle,
+  MobileNavMenu,
+} from "@/components/ui/resizable-navbar";
 
 import { motion } from 'motion/react';
 
@@ -305,6 +316,21 @@ export default function App() {
     : cinematographyWorks.filter(item => item.tags.some(tag => activeFilters.includes(tag)));
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const navItems = [
+    {
+      name: "Home",
+      link: "#home",
+    },
+    {
+      name: "About",
+      link: "#about",
+    },
+    {
+      name: "Contact",
+      link: "#contact",
+    },
+  ];
 
   if (currentPage === 'creative-archive') {
     return (
@@ -632,113 +658,55 @@ export default function App() {
   return (
     <div className="min-h-screen bg-white text-black font-sans selection:bg-black selection:text-white">
       {/* Navigation */}
-      <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${scrolled
-        ? 'bg-white/95 backdrop-blur-md border-b border-black/5 py-0 shadow-sm'
-        : 'bg-transparent border-b border-white/0 py-2'
-        }`}>
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 flex items-center justify-center font-bold text-xl transition-all duration-300 ${scrolled ? 'bg-black text-white' : 'bg-white text-black shadow-md'
-              }`}>K</div>
-            <div>
-              <h1 className={`text-sm font-bold tracking-widest leading-none uppercase transition-colors duration-300 ${scrolled ? 'text-black' : 'text-white'
-                }`}>Kshitij Rathore</h1>
-            </div>
+      <Navbar>
+        {/* Desktop Navigation */}
+        <NavBody>
+          <NavbarLogo />
+          <NavItems items={navItems} />
+          <div className="flex items-center gap-4">
+            <NavbarButton href="#contact" variant="dark">Let's Talk</NavbarButton>
           </div>
+        </NavBody>
 
-          {/* Desktop Menu */}
-          <div className="hidden md:flex items-center gap-8">
-            <a
-              href="#home"
-              onClick={(e) => {
-                e.preventDefault();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-              className={`text-xs font-bold uppercase tracking-widest transition-colors duration-300 ${scrolled ? 'text-black hover:text-black/60' : 'text-white hover:text-white/60'
-                }`}
-            >
-              Home
-            </a>
-            <a
-              href="#about"
-              onClick={(e) => {
-                e.preventDefault();
-                const el = document.getElementById('about');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className={`text-xs font-bold uppercase tracking-widest transition-colors duration-300 ${scrolled ? 'text-black hover:text-black/60' : 'text-white hover:text-white/60'
-                }`}
-            >
-              About
-            </a>
-            <a
-              href="#contact"
-              onClick={(e) => {
-                e.preventDefault();
-                const el = document.getElementById('contact');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className={`px-6 py-2.5 text-xs font-bold uppercase tracking-widest transition-all duration-300 ${scrolled ? 'bg-black text-white hover:bg-neutral-800' : 'bg-white text-black hover:bg-neutral-200 shadow-md'
-                }`}
-            >
-              Let's Talk
-            </a>
-          </div>
+        {/* Mobile Navigation */}
+        <MobileNav>
+          <MobileNavHeader>
+            <NavbarLogo />
+            <MobileNavToggle
+              isOpen={isMenuOpen}
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            />
+          </MobileNavHeader>
 
-          {/* Mobile Menu Button */}
-          <button
-            className={`md:hidden p-2 transition-colors duration-300 ${scrolled ? 'text-black' : 'text-white'
-              }`}
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          <MobileNavMenu
+            isOpen={isMenuOpen}
+            onClose={() => setIsMenuOpen(false)}
           >
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
+            {navItems.map((item, idx) => (
+              <a
+                key={`mobile-link-${idx}`}
+                href={item.link}
+                onClick={() => setIsMenuOpen(false)}
+                className="relative text-neutral-600 dark:text-neutral-300 font-bold uppercase tracking-widest text-[10px]"
+              >
+                <span className="block">{item.name}</span>
+              </a>
+            ))}
+            <div className="flex w-full flex-col gap-4 mt-4">
+              <NavbarButton
+                onClick={() => setIsMenuOpen(false)}
+                href="#contact"
+                variant="dark"
+                className="w-full"
+              >
+                Let's Talk
+              </NavbarButton>
+            </div>
+          </MobileNavMenu>
+        </MobileNav>
+      </Navbar>
 
-        {/* Mobile Menu Overlay */}
-        {isMenuOpen && (
-          <div className="md:hidden fixed inset-0 top-20 bg-white z-40 flex flex-col p-6 space-y-6 h-screen">
-            <a
-              href="#home"
-              className="text-2xl font-light uppercase tracking-widest border-b border-black/5 pb-3 text-black"
-              onClick={() => {
-                setIsMenuOpen(false);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-            >
-              Home
-            </a>
-            <a
-              href="#about"
-              className="text-2xl font-light uppercase tracking-widest border-b border-black/5 pb-3 text-black"
-              onClick={() => {
-                setIsMenuOpen(false);
-                setTimeout(() => {
-                  const el = document.getElementById('about');
-                  if (el) el.scrollIntoView({ behavior: 'smooth' });
-                }, 100);
-              }}
-            >
-              About
-            </a>
-            <a
-              href="#contact"
-              className="w-full py-4 bg-black text-white text-center text-xs font-bold uppercase tracking-widest hover:bg-neutral-800 transition-colors"
-              onClick={() => {
-                setIsMenuOpen(false);
-                setTimeout(() => {
-                  const el = document.getElementById('contact');
-                  if (el) el.scrollIntoView({ behavior: 'smooth' });
-                }, 100);
-              }}
-            >
-              Let's Talk
-            </a>
-          </div>
-        )}
-      </nav>
-
-      <section className="relative min-h-screen px-6 lg:px-8 bg-black overflow-hidden flex items-center justify-center pt-28 pb-20">
+      <section id="home" className="relative min-h-screen px-6 lg:px-8 bg-black overflow-hidden flex items-center justify-center pt-28 pb-20">
         {/* Video Background */}
         <video
           autoPlay
@@ -755,29 +723,22 @@ export default function App() {
 
         <div className="max-w-7xl mx-auto relative z-20 flex flex-col items-center text-center">
           <div className="space-y-12 w-full">
-            <motion.p
-              initial={{ opacity: 0, letterSpacing: "0.2em" }}
-              animate={{ opacity: 0.6, letterSpacing: "0.4em" }}
-              transition={{ duration: 1.5, ease: "easeOut" }}
-              className="uppercase tracking-[0.4em] text-[10px] font-bold text-white flex items-center justify-center gap-6"
-            >
-              <motion.span
-                initial={{ width: 0 }}
-                animate={{ width: 48 }}
-                transition={{ duration: 1, delay: 0.5 }}
-                className="h-[1px] bg-white/20"
-              ></motion.span>
-              DOP . Editor . Colorist
-              <motion.span
-                initial={{ width: 0 }}
-                animate={{ width: 48 }}
-                transition={{ duration: 1, delay: 0.5 }}
-                className="h-[1px] bg-white/20"
-              ></motion.span>
-            </motion.p>
-            <div className="space-y-4">
+            <div className="flex justify-center">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 1.2, delay: 0.2, ease: "easeOut" }}
+                className="px-6 py-2.5 rounded-full bg-white/10 border border-white/15 backdrop-blur-md shadow-[0_0_24px_rgba(255,255,255,0.05)] w-fit"
+              >
+                <p className="uppercase tracking-[0.35em] text-[10px] font-bold text-white leading-none flex items-center gap-2.5">
+                  <Film size={13} className="text-white animate-pulse" />
+                  DOP &bull; Editor &bull; Colorist
+                </p>
+              </motion.div>
+            </div>
+            <div className="space-y-4 -mt-4 md:-mt-8">
               <div className="flex flex-col items-center">
-                <div className="flex overflow-hidden pb-2">
+                <div className="flex overflow-hidden pb-0">
                   {"KSHITIJ".split("").map((char, i) => (
                     <motion.span
                       key={i}
@@ -794,7 +755,7 @@ export default function App() {
                     </motion.span>
                   ))}
                 </div>
-                <div className="flex overflow-hidden">
+                <div className="flex overflow-hidden -mt-2 md:-mt-5">
                   {"RATHORE".split("").map((char, i) => (
                     <motion.span
                       key={i}
@@ -818,7 +779,7 @@ export default function App() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.2, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className="max-w-3xl mx-auto space-y-12"
+              className="max-w-3xl mx-auto space-y-8 -mt-6 md:-mt-10"
             >
               <motion.p
                 animate={{
@@ -835,24 +796,17 @@ export default function App() {
                 The rest is just export settings.
               </motion.p>
 
-              <div className="flex flex-wrap items-center justify-center gap-6">
-                <motion.a
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  href="#works"
-                  className="group relative px-12 py-5 bg-white text-black text-[11px] font-bold uppercase tracking-[0.2em] overflow-hidden transition-all duration-500 hover:pr-16"
-                >
-                  <span className="relative z-10">Explore Works</span>
-                  <span className="absolute right-6 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300">→</span>
-                </motion.a>
-                <motion.a
-                  whileHover={{ scale: 1.02, backgroundColor: "rgba(255,255,255,0.05)" }}
-                  whileTap={{ scale: 0.98 }}
-                  href="#contact"
-                  className="px-12 py-5 border border-white/20 text-[11px] font-bold uppercase tracking-[0.2em] text-white hover:bg-white/10 transition-all duration-300"
-                >
-                  Get in touch
-                </motion.a>
+              <div className="flex flex-wrap items-center justify-center gap-6 pt-4">
+                <a href="#works" className="pushable pushable-light">
+                  <span className="btn-shadow"></span>
+                  <span className="btn-edge"></span>
+                  <span className="btn-front">Explore Works</span>
+                </a>
+                <a href="#contact" className="pushable pushable-dark">
+                  <span className="btn-shadow"></span>
+                  <span className="btn-edge"></span>
+                  <span className="btn-front">Get in touch</span>
+                </a>
               </div>
             </motion.div>
           </div>
@@ -862,8 +816,8 @@ export default function App() {
 
       <section id="works" className="py-20 bg-neutral-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between mb-12">
-          <h2 className="text-3xl font-light tracking-tight text-black flex items-center gap-4">
-            <span className="text-[10px] leading-none font-bold p-1.5 bg-black text-white">01</span>
+          <h2 className="text-2xl font-joyride font-normal tracking-wide text-black uppercase flex items-center gap-4">
+            <span className="text-sm px-3.5 py-1.5 font-bold font-sans bg-black text-white">01</span>
             Recent
           </h2>
           <div className="flex gap-4">
@@ -916,8 +870,8 @@ export default function App() {
       <section id="archive" className="py-20 px-6 lg:px-8 border-t border-black/5">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-8">
-            <h2 className="text-3xl font-light tracking-tight text-black flex items-center gap-4">
-              <span className="text-[10px] leading-none font-bold p-1.5 bg-black text-white">02</span>
+            <h2 className="text-2xl font-joyride font-normal tracking-wide text-black uppercase flex items-center gap-4">
+              <span className="text-sm px-3.5 py-1.5 font-bold font-sans bg-black text-white">02</span>
               All
             </h2>
             <div className="flex gap-3 flex-wrap">
@@ -983,8 +937,8 @@ export default function App() {
 
       <section id="verticals" className="py-20 px-6 lg:px-8 bg-neutral-50 border-t border-black/5">
         <div className="max-w-7xl mx-auto">
-          <h2 className="mb-12 text-3xl font-light tracking-tight text-black flex items-center gap-4">
-            <span className="text-[10px] leading-none font-bold p-1.5 bg-black text-white">03</span>
+          <h2 className="mb-12 text-2xl font-joyride font-normal tracking-wide text-black uppercase flex items-center gap-4">
+            <span className="text-sm px-3.5 py-1.5 font-bold font-sans bg-black text-white">03</span>
             VERTICAL
           </h2>
 
@@ -1037,8 +991,8 @@ export default function App() {
 
       <section id="cinematography" className="py-20 px-6 lg:px-8 bg-white border-t border-black/5">
         <div className="max-w-7xl mx-auto">
-          <h2 className="mb-12 text-3xl font-light tracking-tight text-black flex items-center gap-4">
-            <span className="text-[10px] leading-none font-bold p-1.5 bg-black text-white">04</span>
+          <h2 className="mb-12 text-2xl font-joyride font-normal tracking-wide text-black uppercase flex items-center gap-4">
+            <span className="text-sm px-3.5 py-1.5 font-bold font-sans bg-black text-white">04</span>
             CINEMATOGRAPHY
           </h2>
 
@@ -1132,8 +1086,8 @@ export default function App() {
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-24">
             <div className="space-y-12">
-              <h2 className="text-3xl font-light tracking-tight text-black flex items-center gap-4">
-                <span className="text-[10px] leading-none font-bold p-1.5 bg-black text-white">05</span>
+              <h2 className="text-2xl font-joyride font-normal tracking-wide text-black uppercase flex items-center gap-4">
+                <span className="text-sm px-3.5 py-1.5 font-bold font-sans bg-black text-white">05</span>
                 ABOUT
               </h2>
               <p className="text-4xl md:text-5xl font-light tracking-tight leading-[1.1] text-black">
