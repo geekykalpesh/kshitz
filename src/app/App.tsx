@@ -365,7 +365,7 @@ export default function App() {
                 <button
                   key={filter}
                   onClick={() => toggleFilter(filter)}
-                  className={`px-5 py-2.5 border border-black text-xs font-bold uppercase tracking-widest transition-all cursor-pointer ${activeFilters.includes(filter) ? 'bg-black text-white' : 'hover:bg-neutral-100'
+                  className={`px-5 py-2.5 border border-black rounded-full text-xs font-bold uppercase tracking-widest transition-all cursor-pointer ${activeFilters.includes(filter) ? 'bg-black text-white' : 'hover:bg-neutral-100'
                     }`}
                 >
                   {filter === 'all' ? 'All' : filter === 'dop' ? 'DOP' : filter.charAt(0).toUpperCase() + filter.slice(1)}
@@ -473,7 +473,7 @@ export default function App() {
                 <button
                   key={filter}
                   onClick={() => toggleFilter(filter)}
-                  className={`px-5 py-2.5 border border-black text-xs font-bold uppercase tracking-widest transition-all cursor-pointer ${activeFilters.includes(filter) ? 'bg-black text-white' : 'hover:bg-neutral-100'
+                  className={`px-5 py-2.5 border border-black rounded-full text-xs font-bold uppercase tracking-widest transition-all cursor-pointer ${activeFilters.includes(filter) ? 'bg-black text-white' : 'hover:bg-neutral-100'
                     }`}
                 >
                   {filter === 'all' ? 'All' : filter === 'dop' ? 'DOP' : filter.charAt(0).toUpperCase() + filter.slice(1)}
@@ -580,7 +580,7 @@ export default function App() {
                 <button
                   key={filter}
                   onClick={() => toggleFilter(filter)}
-                  className={`px-5 py-2.5 border border-black text-xs font-bold uppercase tracking-widest transition-all cursor-pointer ${activeFilters.includes(filter) ? 'bg-black text-white' : 'hover:bg-neutral-100'
+                  className={`px-5 py-2.5 border border-black rounded-full text-xs font-bold uppercase tracking-widest transition-all cursor-pointer ${activeFilters.includes(filter) ? 'bg-black text-white' : 'hover:bg-neutral-100'
                     }`}
                 >
                   {filter === 'all' ? 'All' : filter === 'dop' ? 'DOP' : filter.charAt(0).toUpperCase() + filter.slice(1)}
@@ -817,23 +817,23 @@ export default function App() {
       <section id="works" className="py-20 bg-neutral-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between mb-12">
           <h2 className="text-2xl font-joyride font-normal tracking-wide text-black uppercase flex items-center gap-4">
-            <span className="text-sm px-3.5 py-1.5 font-bold font-sans bg-black text-white">01</span>
+            <span className="text-sm px-3.5 py-1 font-bold font-sans bg-black text-white rounded-full">01</span>
             Recent
           </h2>
           <div className="flex gap-4">
             <button
               onClick={() => scroll('left')}
-              className="p-3 border border-black hover:bg-black hover:text-white transition-all duration-300"
+              className="p-3 border border-black rounded-full hover:bg-black hover:text-white transition-all duration-300 flex items-center justify-center cursor-pointer"
               aria-label="Scroll left"
             >
-              <ChevronLeft size={24} />
+              <ChevronLeft size={20} />
             </button>
             <button
               onClick={() => scroll('right')}
-              className="p-3 border border-black hover:bg-black hover:text-white transition-all duration-300"
+              className="p-3 border border-black rounded-full hover:bg-black hover:text-white transition-all duration-300 flex items-center justify-center cursor-pointer"
               aria-label="Scroll right"
             >
-              <ChevronRight size={24} />
+              <ChevronRight size={20} />
             </button>
           </div>
         </div>
@@ -871,7 +871,7 @@ export default function App() {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-8">
             <h2 className="text-2xl font-joyride font-normal tracking-wide text-black uppercase flex items-center gap-4">
-              <span className="text-sm px-3.5 py-1.5 font-bold font-sans bg-black text-white">02</span>
+              <span className="text-sm px-3.5 py-1 font-bold font-sans bg-black text-white rounded-full">02</span>
               All
             </h2>
             <div className="flex gap-3 flex-wrap">
@@ -879,7 +879,7 @@ export default function App() {
                 <button
                   key={filter}
                   onClick={() => toggleFilter(filter)}
-                  className={`px-5 py-2.5 border border-black text-xs font-bold uppercase tracking-widest transition-all ${activeFilters.includes(filter) ? 'bg-black text-white' : 'hover:bg-neutral-100'
+                  className={`px-5 py-2.5 border border-black rounded-full text-xs font-bold uppercase tracking-widest transition-all cursor-pointer ${activeFilters.includes(filter) ? 'bg-black text-white' : 'hover:bg-neutral-100'
                     }`}
                 >
                   {filter === 'all' ? 'All' : filter === 'dop' ? 'DOP' : filter.charAt(0).toUpperCase() + filter.slice(1)}
@@ -938,7 +938,7 @@ export default function App() {
       <section id="verticals" className="py-20 px-6 lg:px-8 bg-neutral-50 border-t border-black/5">
         <div className="max-w-7xl mx-auto">
           <h2 className="mb-12 text-2xl font-joyride font-normal tracking-wide text-black uppercase flex items-center gap-4">
-            <span className="text-sm px-3.5 py-1.5 font-bold font-sans bg-black text-white">03</span>
+            <span className="text-sm px-3.5 py-1 font-bold font-sans bg-black text-white rounded-full">03</span>
             VERTICAL
           </h2>
 
@@ -992,7 +992,7 @@ export default function App() {
       <section id="cinematography" className="py-20 px-6 lg:px-8 bg-white border-t border-black/5">
         <div className="max-w-7xl mx-auto">
           <h2 className="mb-12 text-2xl font-joyride font-normal tracking-wide text-black uppercase flex items-center gap-4">
-            <span className="text-sm px-3.5 py-1.5 font-bold font-sans bg-black text-white">04</span>
+            <span className="text-sm px-3.5 py-1 font-bold font-sans bg-black text-white rounded-full">04</span>
             CINEMATOGRAPHY
           </h2>
 
@@ -1087,7 +1087,7 @@ export default function App() {
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-24">
             <div className="space-y-12">
               <h2 className="text-2xl font-joyride font-normal tracking-wide text-black uppercase flex items-center gap-4">
-                <span className="text-sm px-3.5 py-1.5 font-bold font-sans bg-black text-white">05</span>
+                <span className="text-sm px-3.5 py-1 font-bold font-sans bg-black text-white rounded-full">05</span>
                 ABOUT
               </h2>
               <p className="text-4xl md:text-5xl font-light tracking-tight leading-[1.1] text-black">
