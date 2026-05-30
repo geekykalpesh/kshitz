@@ -30,7 +30,7 @@ export function Marquee() {
       <div className="mb-4 text-center">
         <h3 className="text-sm font-bold tracking-widest uppercase text-black/60">Collaborated With</h3>
       </div>
-      
+
       <div className="relative flex overflow-hidden py-0">
         {/* First group */}
         <div className="flex animate-marquee whitespace-nowrap items-center">
@@ -39,16 +39,16 @@ export function Marquee() {
               key={`first-${index}`}
               className="mx-12 flex items-center justify-center group"
             >
-              <img 
-                src={logo.src} 
-                alt={logo.alt} 
+              <img
+                src={logo.src}
+                alt={logo.alt}
                 className="h-16 md:h-24 w-auto object-contain opacity-100 transition-all duration-500 group-hover:scale-110"
                 style={{ minWidth: '150px' }}
               />
             </div>
           ))}
         </div>
-        
+
         {/* Second group for seamless loop */}
         <div className="absolute top-0 flex animate-marquee2 whitespace-nowrap items-center h-full">
           {logos.map((logo, index) => (
@@ -56,9 +56,9 @@ export function Marquee() {
               key={`second-${index}`}
               className="mx-12 flex items-center justify-center group"
             >
-              <img 
-                src={logo.src} 
-                alt={logo.alt} 
+              <img
+                src={logo.src}
+                alt={logo.alt}
                 className="h-16 md:h-24 w-auto object-contain opacity-100 transition-all duration-500 group-hover:scale-110"
                 style={{ minWidth: '150px' }}
               />

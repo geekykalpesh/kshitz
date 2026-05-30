@@ -19,27 +19,39 @@ interface WorkItem {
 function Footer() {
   return (
     <footer id="contact" className="py-16 px-6 lg:px-8 bg-black text-white w-full border-t border-white/10 relative z-10">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="mb-8 text-white text-3xl font-light tracking-tight">Get In Touch</h2>
-          <div className="space-y-3 text-lg font-light">
-            <p>
-              <a href="mailto:kshitizfx@gmail.com" className="hover:opacity-70 transition-opacity">
-                kshitizfx@gmail.com
-              </a>
-            </p>
-            <p>
-              <a href="tel:+919039735357" className="hover:opacity-70 transition-opacity">
-                +91 90397 35357
-              </a>
-            </p>
-          </div>
+      <div className="max-w-7xl mx-auto flex flex-col items-center justify-center">
+        {/* Top: Email Address */}
+        <div className="mb-6">
+          <a 
+            href="mailto:kshitizfx@gmail.com" 
+            className="text-white hover:text-neutral-300 transition-colors duration-300 tracking-wider lowercase text-2xl sm:text-4xl md:text-5xl font-light block text-center"
+          >
+            kshitizfx@gmail.com
+          </a>
         </div>
-        <div className="flex justify-center gap-8 flex-wrap text-sm uppercase tracking-wider opacity-80">
-          <a href="https://www.instagram.com/kshitizfx/" target="_blank" rel="noopener noreferrer" className="hover:opacity-70 transition-opacity">Instagram</a>
-          <a href="https://www.linkedin.com/in/kshitizfx/" target="_blank" rel="noopener noreferrer" className="hover:opacity-70 transition-opacity">LinkedIn</a>
+
+        {/* Middle: Socials side-by-side */}
+        <div className="flex items-center gap-12 text-xs uppercase tracking-[0.25em] text-white/60 mb-12">
+          <a 
+            href="https://www.instagram.com/kshitizfx/" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="hover:text-white transition-colors duration-300"
+          >
+            Instagram
+          </a>
+          <a 
+            href="https://www.linkedin.com/in/kshitizfx/" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="hover:text-white transition-colors duration-300"
+          >
+            LinkedIn
+          </a>
         </div>
-        <div className="mt-12 pt-8 border-t border-white/10 text-center opacity-40 text-xs">
+
+        {/* Bottom: Copyright Bar */}
+        <div className="w-full pt-8 border-t border-white/5 text-center text-[10px] uppercase tracking-widest text-white/20">
           <p>&copy; 2026 Kshitij Rathore. All rights reserved.</p>
         </div>
       </div>
@@ -74,6 +86,32 @@ export default function App() {
       const fileId = url.match(/\/file\/d\/([^/?]+)/)?.[1] || url.match(/id=([^&?]+)/)?.[1];
       if (fileId) {
         return `https://drive.google.com/file/d/${fileId}/preview`;
+      }
+    }
+    return url;
+  };
+
+  const isDirectVideo = (url: string) => {
+    if (!url) return false;
+    const lowerUrl = url.toLowerCase();
+    return (
+      lowerUrl.endsWith('.mp4') ||
+      lowerUrl.endsWith('.webm') ||
+      lowerUrl.endsWith('.ogg') ||
+      lowerUrl.includes('cloudinary.com') ||
+      lowerUrl.includes('.mp4?') ||
+      lowerUrl.includes('.webm?') ||
+      lowerUrl.includes('.ogg?')
+    );
+  };
+
+  const getDirectVideoUrl = (url: string) => {
+    if (!url) return '';
+    if (url.includes('drive.google.com')) {
+      const fileId = url.match(/\/file\/d\/([^/?]+)/)?.[1] || url.match(/id=([^&?]+)/)?.[1];
+      if (fileId) {
+        // Stream direct binary data via Google Drive's uc export download endpoint
+        return `https://docs.google.com/uc?export=download&id=${fileId}`;
       }
     }
     return url;
@@ -1068,12 +1106,22 @@ export default function App() {
             >
               <X size={28} />
             </button>
-            <iframe
-              src={getEmbedUrl(playingItem.videoLink)}
-              className="w-full h-full"
-              allow="autoplay; encrypted-media"
-              allowFullScreen
-            ></iframe>
+            {isDirectVideo(playingItem.videoLink) ? (
+              <video
+                src={getDirectVideoUrl(playingItem.videoLink)}
+                className="w-full h-full object-contain"
+                controls
+                autoPlay
+                playsInline
+              />
+            ) : (
+              <iframe
+                src={getEmbedUrl(playingItem.videoLink)}
+                className="w-full h-full"
+                allow="autoplay; encrypted-media"
+                allowFullScreen
+              ></iframe>
+            )}
           </div>
         </div>
       )}
