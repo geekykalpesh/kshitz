@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, X, Film } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Film, Play, ArrowLeft } from 'lucide-react';
 import { ImageWithFallback } from './components/figma/ImageWithFallback';
 import { Marquee } from './components/Marquee';
 import {
@@ -17,6 +17,7 @@ import { motion } from 'motion/react';
 import { fetchWorks } from '@/lib/api';
 import { transformWork, DisplayWorkItem } from '@/lib/transformWork';
 import { MuxVideoPlayer } from '@/components/MuxVideoPlayer';
+import { ShimmerCarousel, ShimmerGrid, ShimmerFilters } from './components/Shimmer';
 
 function Footer() {
   return (
@@ -81,7 +82,6 @@ export default function App() {
       const baseUrl = url.split('?')[0];
       return baseUrl.endsWith('/') ? `${baseUrl}embed` : `${baseUrl}/embed`;
     }
-    // Disallow Google Drive embed player
     return url;
   };
 
@@ -111,7 +111,7 @@ export default function App() {
       try {
         const works = await fetchWorks();
         const transformed = works
-          .filter(w => w.title) // filter out empty rows
+          .filter(w => w.title)
           .map(transformWork);
         setData(transformed);
       } catch (error) {
@@ -215,15 +215,15 @@ export default function App() {
       onClick={onClose}
     >
       <div
-        className={`relative w-full ${item.category === 'VERTICAL' ? 'max-w-[400px] aspect-[9/16]' : 'max-w-6xl aspect-video'} bg-black shadow-2xl ring-1 ring-white/10`}
+        className={`relative w-full ${item.category === 'VERTICAL' ? 'max-w-[400px] aspect-[9/16]' : 'max-w-6xl aspect-video'} bg-black shadow-2xl ring-1 ring-white/10 rounded-xl overflow-hidden scale-100 animate-in zoom-in-95 duration-200`}
         onClick={e => e.stopPropagation()}
       >
         <button
           onClick={onClose}
-          className="absolute -top-12 right-0 md:-right-14 md:top-0 text-white/70 hover:text-white transition-colors flex items-center justify-center bg-black/40 p-2 rounded-full backdrop-blur-md cursor-pointer"
+          className="absolute -top-12 right-0 md:-right-14 md:top-0 text-white/70 hover:text-white transition-all duration-300 hover:rotate-90 hover:scale-110 flex items-center justify-center bg-black/50 hover:bg-white hover:text-black p-2.5 rounded-full backdrop-blur-md cursor-pointer border border-white/20 shadow-xl"
           aria-label="Close"
         >
-          <X size={28} />
+          <X size={26} />
         </button>
         {isDirectVideo(item.videoLink) ? (
           <MuxVideoPlayer
@@ -255,12 +255,13 @@ export default function App() {
           <div className="max-w-7xl mx-auto px-6 lg:px-8 h-20 flex items-center justify-between">
             <button
               onClick={() => { setCurrentPage('home'); window.scrollTo({ top: 0, behavior: 'instant' }); }}
-              className="group flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-black hover:text-black/60 transition-colors cursor-pointer"
+              className="group flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-black hover:text-black/60 transition-all cursor-pointer btn-tactile"
             >
-              <span className="transition-transform duration-300 group-hover:-translate-x-1">←</span> Back to Portfolio
+              <ArrowLeft size={16} className="transition-transform duration-300 group-hover:-translate-x-1" />
+              <span>Back to Portfolio</span>
             </button>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-black text-white flex items-center justify-center font-bold text-xl">K</div>
+              <div className="w-10 h-10 bg-black text-white flex items-center justify-center font-bold text-xl shadow-md">K</div>
               <h1 className="text-sm font-bold tracking-widest uppercase hidden sm:block">Kshitij Rathore</h1>
             </div>
           </div>
@@ -272,27 +273,39 @@ export default function App() {
               <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-400 mb-2">Creative Collection</p>
               <h2 className="text-4xl font-light tracking-tight text-black">CREATIVE ARCHIVE ({filteredWorkItems.length})</h2>
             </div>
-            <div className="flex gap-3 flex-wrap">
-              {['all', 'editor', 'colorist', 'motion', 'dop'].map((filter) => (
-                <button key={filter} onClick={() => toggleFilter(filter)}
-                  className={`px-5 py-2.5 border border-black rounded-full text-xs font-bold uppercase tracking-widest transition-all cursor-pointer ${activeFilters.includes(filter) ? 'bg-black text-white' : 'hover:bg-neutral-100'}`}
-                >
-                  {filter === 'all' ? 'All' : filter === 'dop' ? 'DOP' : filter.charAt(0).toUpperCase() + filter.slice(1)}
-                </button>
-              ))}
-            </div>
+            {loading ? (
+              <ShimmerFilters />
+            ) : (
+              <div className="flex gap-3 flex-wrap">
+                {['all', 'editor', 'colorist', 'motion', 'dop'].map((filter) => (
+                  <button key={filter} onClick={() => toggleFilter(filter)}
+                    className={`px-5 py-2.5 border border-black rounded-full text-xs font-bold uppercase tracking-widest transition-all cursor-pointer btn-tactile ${activeFilters.includes(filter) ? 'bg-black text-white shadow-md' : 'hover:bg-neutral-100'}`}
+                  >
+                    {filter === 'all' ? 'All' : filter === 'dop' ? 'DOP' : filter.charAt(0).toUpperCase() + filter.slice(1)}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
-          {filteredWorkItems.length > 0 ? (
+          {loading ? (
+            <ShimmerGrid count={9} aspect="video" cols={3} />
+          ) : filteredWorkItems.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0">
               {filteredWorkItems.map((item) => (
-                <div key={item.id} className="group cursor-pointer" onClick={() => setPlayingItem(item)}>
+                <div key={item.id} className="group cursor-pointer relative overflow-hidden" onClick={() => setPlayingItem(item)}>
                   <div className="relative aspect-video overflow-hidden bg-neutral-200">
                     <ImageWithFallback src={item.image} fallbackSrc={item.fallbackSrc} alt={item.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-6 opacity-0 group-hover:opacity-100 transition-all duration-500">
-                      <h3 className="text-white mb-2 text-xl font-bold translate-y-2 group-hover:translate-y-0 transition-transform duration-300">{item.title}</h3>
-                      <div className="flex gap-2 flex-wrap translate-y-2 group-hover:translate-y-0 transition-transform duration-300 delay-75">
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
+                    {/* Centered micro-interaction play button on hover */}
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+                      <div className="w-12 h-12 rounded-full bg-white/25 backdrop-blur-md border border-white/30 flex items-center justify-center text-white scale-75 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300 shadow-xl group-hover:rotate-6">
+                        <Play size={18} fill="currentColor" className="ml-0.5" />
+                      </div>
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent flex flex-col justify-end p-6 opacity-0 group-hover:opacity-100 transition-all duration-400">
+                      <h3 className="text-white mb-2 text-xl font-bold translate-y-3 group-hover:translate-y-0 transition-transform duration-300">{item.title}</h3>
+                      <div className="flex gap-2 flex-wrap translate-y-3 group-hover:translate-y-0 transition-transform duration-300 delay-75">
                         {item.tags.map((tag) => (
                           <span key={tag} className="px-2 py-0.5 bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold uppercase tracking-widest">{tag}</span>
                         ))}
@@ -303,7 +316,7 @@ export default function App() {
               ))}
             </div>
           ) : (
-            <div className="py-20 text-center border border-dashed border-black/10">
+            <div className="py-20 text-center border border-dashed border-black/10 rounded-xl">
               <p className="text-black/40 uppercase tracking-[0.2em] text-xs font-bold">No horizontal works found.</p>
             </div>
           )}
@@ -314,17 +327,19 @@ export default function App() {
     );
   }
 
+  // Portrait Cinema page
   if (currentPage === 'portrait-cinema') {
     return (
       <div className="min-h-screen bg-white text-black font-sans selection:bg-black selection:text-white animate-in fade-in duration-300">
         <nav className="fixed top-0 left-0 w-full z-50 bg-white/95 backdrop-blur-md border-b border-black/5">
           <div className="max-w-7xl mx-auto px-6 lg:px-8 h-20 flex items-center justify-between">
             <button onClick={() => { setCurrentPage('home'); window.scrollTo({ top: 0, behavior: 'instant' }); }}
-              className="group flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-black hover:text-black/60 transition-colors cursor-pointer">
-              <span className="transition-transform duration-300 group-hover:-translate-x-1">←</span> Back to Portfolio
+              className="group flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-black hover:text-black/60 transition-all cursor-pointer btn-tactile">
+              <ArrowLeft size={16} className="transition-transform duration-300 group-hover:-translate-x-1" />
+              <span>Back to Portfolio</span>
             </button>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-black text-white flex items-center justify-center font-bold text-xl">K</div>
+              <div className="w-10 h-10 bg-black text-white flex items-center justify-center font-bold text-xl shadow-md">K</div>
               <h1 className="text-sm font-bold tracking-widest uppercase hidden sm:block">Kshitij Rathore</h1>
             </div>
           </div>
@@ -336,26 +351,37 @@ export default function App() {
               <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-400 mb-2">Cinematic Shorts</p>
               <h2 className="text-4xl font-light tracking-tight text-black">VERTICAL ({filteredVerticalVideos.length})</h2>
             </div>
-            <div className="flex gap-3 flex-wrap">
-              {['all', 'editor', 'colorist', 'motion', 'dop'].map((filter) => (
-                <button key={filter} onClick={() => toggleFilter(filter)}
-                  className={`px-5 py-2.5 border border-black rounded-full text-xs font-bold uppercase tracking-widest transition-all cursor-pointer ${activeFilters.includes(filter) ? 'bg-black text-white' : 'hover:bg-neutral-100'}`}>
-                  {filter === 'all' ? 'All' : filter === 'dop' ? 'DOP' : filter.charAt(0).toUpperCase() + filter.slice(1)}
-                </button>
-              ))}
-            </div>
+            {loading ? (
+              <ShimmerFilters />
+            ) : (
+              <div className="flex gap-3 flex-wrap">
+                {['all', 'editor', 'colorist', 'motion', 'dop'].map((filter) => (
+                  <button key={filter} onClick={() => toggleFilter(filter)}
+                    className={`px-5 py-2.5 border border-black rounded-full text-xs font-bold uppercase tracking-widest transition-all cursor-pointer btn-tactile ${activeFilters.includes(filter) ? 'bg-black text-white shadow-md' : 'hover:bg-neutral-100'}`}>
+                    {filter === 'all' ? 'All' : filter === 'dop' ? 'DOP' : filter.charAt(0).toUpperCase() + filter.slice(1)}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
-          {filteredVerticalVideos.length > 0 ? (
+          {loading ? (
+            <ShimmerGrid count={10} aspect="vertical" cols={5} />
+          ) : filteredVerticalVideos.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-0">
               {filteredVerticalVideos.map((item) => (
-                <div key={item.id} className="group cursor-pointer w-full" onClick={() => setPlayingItem(item)}>
+                <div key={item.id} className="group cursor-pointer w-full relative overflow-hidden" onClick={() => setPlayingItem(item)}>
                   <div className="relative aspect-[9/16] overflow-hidden bg-neutral-200">
                     <ImageWithFallback src={item.image} fallbackSrc={item.fallbackSrc} alt={item.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent flex flex-col justify-end p-6 opacity-0 group-hover:opacity-100 transition-all duration-500">
-                      <h3 className="text-white text-lg font-bold translate-y-2 group-hover:translate-y-0 transition-transform duration-300">{item.title}</h3>
-                      <div className="flex gap-2 flex-wrap mt-2 translate-y-2 group-hover:translate-y-0 transition-transform duration-300 delay-75">
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+                      <div className="w-12 h-12 rounded-full bg-white/25 backdrop-blur-md border border-white/30 flex items-center justify-center text-white scale-75 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300 shadow-xl group-hover:rotate-6">
+                        <Play size={18} fill="currentColor" className="ml-0.5" />
+                      </div>
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent flex flex-col justify-end p-6 opacity-0 group-hover:opacity-100 transition-all duration-400">
+                      <h3 className="text-white text-lg font-bold translate-y-3 group-hover:translate-y-0 transition-transform duration-300">{item.title}</h3>
+                      <div className="flex gap-2 flex-wrap mt-2 translate-y-3 group-hover:translate-y-0 transition-transform duration-300 delay-75">
                         {item.tags.map((tag) => (
                           <span key={tag} className="px-2 py-0.5 bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold uppercase tracking-widest">{tag}</span>
                         ))}
@@ -366,7 +392,7 @@ export default function App() {
               ))}
             </div>
           ) : (
-            <div className="py-20 text-center border border-dashed border-black/10">
+            <div className="py-20 text-center border border-dashed border-black/10 rounded-xl">
               <p className="text-black/40 uppercase tracking-[0.2em] text-xs font-bold">No vertical works found.</p>
             </div>
           )}
@@ -377,17 +403,19 @@ export default function App() {
     );
   }
 
+  // Cinematography page
   if (currentPage === 'cinematography') {
     return (
       <div className="min-h-screen bg-white text-black font-sans selection:bg-black selection:text-white animate-in fade-in duration-300">
         <nav className="fixed top-0 left-0 w-full z-50 bg-white/95 backdrop-blur-md border-b border-black/5">
           <div className="max-w-7xl mx-auto px-6 lg:px-8 h-20 flex items-center justify-between">
             <button onClick={() => { setCurrentPage('home'); window.scrollTo({ top: 0, behavior: 'instant' }); }}
-              className="group flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-black hover:text-black/60 transition-colors cursor-pointer">
-              <span className="transition-transform duration-300 group-hover:-translate-x-1">←</span> Back to Portfolio
+              className="group flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-black hover:text-black/60 transition-all cursor-pointer btn-tactile">
+              <ArrowLeft size={16} className="transition-transform duration-300 group-hover:-translate-x-1" />
+              <span>Back to Portfolio</span>
             </button>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-black text-white flex items-center justify-center font-bold text-xl">K</div>
+              <div className="w-10 h-10 bg-black text-white flex items-center justify-center font-bold text-xl shadow-md">K</div>
               <h1 className="text-sm font-bold tracking-widest uppercase hidden sm:block">Kshitij Rathore</h1>
             </div>
           </div>
@@ -396,29 +424,41 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8 pt-32 pb-24">
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-16 gap-8 border-b border-black/5 pb-8">
             <div>
-              <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-400 mb-2">Cinematic Collection</p>
+              <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-400 mb-2">Director of Photography</p>
               <h2 className="text-4xl font-light tracking-tight text-black">CINEMATOGRAPHY ({filteredCinematographyWorks.length})</h2>
             </div>
-            <div className="flex gap-3 flex-wrap">
-              {['all', 'editor', 'colorist', 'motion', 'dop'].map((filter) => (
-                <button key={filter} onClick={() => toggleFilter(filter)}
-                  className={`px-5 py-2.5 border border-black rounded-full text-xs font-bold uppercase tracking-widest transition-all cursor-pointer ${activeFilters.includes(filter) ? 'bg-black text-white' : 'hover:bg-neutral-100'}`}>
-                  {filter === 'all' ? 'All' : filter === 'dop' ? 'DOP' : filter.charAt(0).toUpperCase() + filter.slice(1)}
-                </button>
-              ))}
-            </div>
+            {loading ? (
+              <ShimmerFilters />
+            ) : (
+              <div className="flex gap-3 flex-wrap">
+                {['all', 'editor', 'colorist', 'motion', 'dop'].map((filter) => (
+                  <button key={filter} onClick={() => toggleFilter(filter)}
+                    className={`px-5 py-2.5 border border-black rounded-full text-xs font-bold uppercase tracking-widest transition-all cursor-pointer btn-tactile ${activeFilters.includes(filter) ? 'bg-black text-white shadow-md' : 'hover:bg-neutral-100'}`}
+                  >
+                    {filter === 'all' ? 'All' : filter === 'dop' ? 'DOP' : filter.charAt(0).toUpperCase() + filter.slice(1)}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
-          {filteredCinematographyWorks.length > 0 ? (
+          {loading ? (
+            <ShimmerGrid count={6} aspect="video" cols={3} />
+          ) : filteredCinematographyWorks.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0">
               {filteredCinematographyWorks.map((item) => (
-                <div key={item.id} className="group cursor-pointer" onClick={() => setPlayingItem(item)}>
+                <div key={item.id} className="group cursor-pointer relative overflow-hidden" onClick={() => setPlayingItem(item)}>
                   <div className={`relative ${item.category === 'VERTICAL' ? 'aspect-[9/16]' : 'aspect-video'} overflow-hidden bg-neutral-200`}>
                     <ImageWithFallback src={item.image} fallbackSrc={item.fallbackSrc} alt={item.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-6 opacity-0 group-hover:opacity-100 transition-all duration-500">
-                      <h3 className="text-white mb-2 text-xl font-bold translate-y-2 group-hover:translate-y-0 transition-transform duration-300">{item.title}</h3>
-                      <div className="flex gap-2 flex-wrap translate-y-2 group-hover:translate-y-0 transition-transform duration-300 delay-75">
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+                      <div className="w-12 h-12 rounded-full bg-white/25 backdrop-blur-md border border-white/30 flex items-center justify-center text-white scale-75 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300 shadow-xl group-hover:rotate-6">
+                        <Play size={18} fill="currentColor" className="ml-0.5" />
+                      </div>
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent flex flex-col justify-end p-6 opacity-0 group-hover:opacity-100 transition-all duration-400">
+                      <h3 className="text-white mb-2 text-xl font-bold translate-y-3 group-hover:translate-y-0 transition-transform duration-300">{item.title}</h3>
+                      <div className="flex gap-2 flex-wrap translate-y-3 group-hover:translate-y-0 transition-transform duration-300 delay-75">
                         {item.tags.map((tag) => (
                           <span key={tag} className="px-2 py-0.5 bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold uppercase tracking-widest">{tag}</span>
                         ))}
@@ -429,7 +469,7 @@ export default function App() {
               ))}
             </div>
           ) : (
-            <div className="py-20 text-center border border-dashed border-black/10">
+            <div className="py-20 text-center border border-dashed border-black/10 rounded-xl">
               <p className="text-black/40 uppercase tracking-[0.2em] text-xs font-bold">No cinematography works found.</p>
             </div>
           )}
@@ -440,9 +480,9 @@ export default function App() {
     );
   }
 
+  // Main Home view
   return (
     <div className="min-h-screen bg-white text-black font-sans selection:bg-black selection:text-white">
-      {/* Navigation */}
       <Navbar>
         <NavBody>
           <NavbarLogo />
@@ -557,17 +597,7 @@ export default function App() {
         </div>
       </section>
 
-      {/* Loading indicator */}
-      {loading && (
-        <div className="flex items-center justify-center py-20">
-          <div className="flex gap-2">
-            <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-            <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-            <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-          </div>
-        </div>
-      )}
-
+      {/* ─── 01 Recent (Featured Works Carousel) ─── */}
       <section id="works" className="py-20 bg-neutral-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between mb-12">
           <h2 className="text-2xl font-joyride font-normal tracking-wide text-black uppercase flex items-center gap-4">
@@ -575,36 +605,58 @@ export default function App() {
             Recent
           </h2>
           <div className="flex gap-4">
-            <button onClick={() => scroll('left')} className="p-3 border border-black rounded-full hover:bg-black hover:text-white transition-all duration-300 flex items-center justify-center cursor-pointer" aria-label="Scroll left">
+            <button
+              onClick={() => scroll('left')}
+              className="p-3 border border-black rounded-full hover:bg-black hover:text-white hover:scale-110 active:scale-90 transition-all duration-300 flex items-center justify-center cursor-pointer shadow-sm hover:shadow-md"
+              aria-label="Scroll left"
+            >
               <ChevronLeft size={20} />
             </button>
-            <button onClick={() => scroll('right')} className="p-3 border border-black rounded-full hover:bg-black hover:text-white transition-all duration-300 flex items-center justify-center cursor-pointer" aria-label="Scroll right">
+            <button
+              onClick={() => scroll('right')}
+              className="p-3 border border-black rounded-full hover:bg-black hover:text-white hover:scale-110 active:scale-90 transition-all duration-300 flex items-center justify-center cursor-pointer shadow-sm hover:shadow-md"
+              aria-label="Scroll right"
+            >
               <ChevronRight size={20} />
             </button>
           </div>
         </div>
-        <div ref={scrollRef} className="overflow-x-auto no-scrollbar scroll-smooth">
-          <div className="flex gap-0 min-w-max">
-            {featuredWorks.map((item) => (
-              <div key={item.id} className="group cursor-pointer w-[480px] flex-shrink-0" onClick={() => setPlayingItem(item)}>
-                <div className="relative aspect-video overflow-hidden bg-neutral-200">
-                  <ImageWithFallback src={item.image} fallbackSrc={item.fallbackSrc} alt={item.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-6 opacity-0 group-hover:opacity-100 transition-all duration-500">
-                    <h3 className="text-white mb-2 text-xl font-bold translate-y-2 group-hover:translate-y-0 transition-transform duration-300">{item.title}</h3>
-                    <div className="flex gap-2 flex-wrap translate-y-2 group-hover:translate-y-0 transition-transform duration-300 delay-75">
-                      {item.tags.map((tag) => (
-                        <span key={tag} className="px-2 py-0.5 bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold uppercase tracking-widest">{tag}</span>
-                      ))}
+
+        {loading ? (
+          <div className="max-w-7xl mx-auto px-6 lg:px-8">
+            <ShimmerCarousel count={4} />
+          </div>
+        ) : (
+          <div ref={scrollRef} className="overflow-x-auto no-scrollbar scroll-smooth">
+            <div className="flex gap-0 min-w-max">
+              {featuredWorks.map((item) => (
+                <div key={item.id} className="group cursor-pointer w-[340px] sm:w-[420px] md:w-[480px] flex-shrink-0 relative overflow-hidden" onClick={() => setPlayingItem(item)}>
+                  <div className="relative aspect-video overflow-hidden bg-neutral-200">
+                    <ImageWithFallback src={item.image} fallbackSrc={item.fallbackSrc} alt={item.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
+                    {/* Centered micro-interaction play button on hover */}
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+                      <div className="w-12 h-12 rounded-full bg-white/25 backdrop-blur-md border border-white/30 flex items-center justify-center text-white scale-75 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300 shadow-xl group-hover:rotate-6">
+                        <Play size={18} fill="currentColor" className="ml-0.5" />
+                      </div>
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent flex flex-col justify-end p-6 opacity-0 group-hover:opacity-100 transition-all duration-400">
+                      <h3 className="text-white mb-2 text-xl font-bold translate-y-3 group-hover:translate-y-0 transition-transform duration-300">{item.title}</h3>
+                      <div className="flex gap-2 flex-wrap translate-y-3 group-hover:translate-y-0 transition-transform duration-300 delay-75">
+                        {item.tags.map((tag) => (
+                          <span key={tag} className="px-2 py-0.5 bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold uppercase tracking-widest">{tag}</span>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </section>
 
+      {/* ─── 02 All Works (Grid with Filter) ─── */}
       <section id="archive" className="py-20 px-6 lg:px-8 border-t border-black/5">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-8">
@@ -612,27 +664,38 @@ export default function App() {
               <span className="text-sm px-3.5 py-1 font-bold font-sans bg-black text-white rounded-full">02</span>
               All
             </h2>
-            <div className="flex gap-3 flex-wrap">
-              {['all', 'editor', 'colorist', 'motion', 'dop'].map((filter) => (
-                <button key={filter} onClick={() => toggleFilter(filter)}
-                  className={`px-5 py-2.5 border border-black rounded-full text-xs font-bold uppercase tracking-widest transition-all cursor-pointer ${activeFilters.includes(filter) ? 'bg-black text-white' : 'hover:bg-neutral-100'}`}>
-                  {filter === 'all' ? 'All' : filter === 'dop' ? 'DOP' : filter.charAt(0).toUpperCase() + filter.slice(1)}
-                </button>
-              ))}
-            </div>
+            {loading ? (
+              <ShimmerFilters />
+            ) : (
+              <div className="flex gap-3 flex-wrap">
+                {['all', 'editor', 'colorist', 'motion', 'dop'].map((filter) => (
+                  <button key={filter} onClick={() => toggleFilter(filter)}
+                    className={`px-5 py-2.5 border border-black rounded-full text-xs font-bold uppercase tracking-widest transition-all cursor-pointer btn-tactile ${activeFilters.includes(filter) ? 'bg-black text-white shadow-md' : 'hover:bg-neutral-100'}`}>
+                    {filter === 'all' ? 'All' : filter === 'dop' ? 'DOP' : filter.charAt(0).toUpperCase() + filter.slice(1)}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
-          {filteredWorkItems.length > 0 ? (
+          {loading ? (
+            <ShimmerGrid count={6} aspect="video" cols={3} />
+          ) : filteredWorkItems.length > 0 ? (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0">
                 {filteredWorkItems.slice(0, colsCreative * 3).map((item) => (
-                  <div key={item.id} className="group cursor-pointer" onClick={() => setPlayingItem(item)}>
+                  <div key={item.id} className="group cursor-pointer relative overflow-hidden" onClick={() => setPlayingItem(item)}>
                     <div className="relative aspect-video overflow-hidden bg-neutral-200">
                       <ImageWithFallback src={item.image} fallbackSrc={item.fallbackSrc} alt={item.title}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-6 opacity-0 group-hover:opacity-100 transition-all duration-500">
-                        <h3 className="text-white mb-2 text-xl font-bold translate-y-2 group-hover:translate-y-0 transition-transform duration-300">{item.title}</h3>
-                        <div className="flex gap-2 flex-wrap translate-y-2 group-hover:translate-y-0 transition-transform duration-300 delay-75">
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+                        <div className="w-12 h-12 rounded-full bg-white/25 backdrop-blur-md border border-white/30 flex items-center justify-center text-white scale-75 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300 shadow-xl group-hover:rotate-6">
+                          <Play size={18} fill="currentColor" className="ml-0.5" />
+                        </div>
+                      </div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent flex flex-col justify-end p-6 opacity-0 group-hover:opacity-100 transition-all duration-400">
+                        <h3 className="text-white mb-2 text-xl font-bold translate-y-3 group-hover:translate-y-0 transition-transform duration-300">{item.title}</h3>
+                        <div className="flex gap-2 flex-wrap translate-y-3 group-hover:translate-y-0 transition-transform duration-300 delay-75">
                           {item.tags.map((tag) => (
                             <span key={tag} className="px-2 py-0.5 bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold uppercase tracking-widest">{tag}</span>
                           ))}
@@ -645,20 +708,21 @@ export default function App() {
               {filteredWorkItems.length > colsCreative * 3 && (
                 <div className="flex justify-center mt-16">
                   <button onClick={() => { setCurrentPage('creative-archive'); window.scrollTo({ top: 0, behavior: 'instant' }); }}
-                    className="px-12 py-5 border border-black text-[11px] font-bold uppercase tracking-[0.2em] text-black hover:bg-black hover:text-white transition-all duration-300 rounded-full cursor-pointer">
+                    className="px-12 py-5 border border-black text-[11px] font-bold uppercase tracking-[0.2em] text-black hover:bg-black hover:text-white transition-all duration-300 rounded-full cursor-pointer btn-tactile hover:shadow-lg">
                     See More
                   </button>
                 </div>
               )}
             </>
           ) : (
-            <div className="py-20 text-center border border-dashed border-black/10">
+            <div className="py-20 text-center border border-dashed border-black/10 rounded-xl">
               <p className="text-black/40 uppercase tracking-[0.2em] text-xs font-bold">No horizontal works found for this selection.</p>
             </div>
           )}
         </div>
       </section>
 
+      {/* ─── 03 Vertical Works ─── */}
       <section id="verticals" className="py-20 px-6 lg:px-8 bg-neutral-50 border-t border-black/5">
         <div className="max-w-7xl mx-auto">
           <h2 className="mb-12 text-2xl font-joyride font-normal tracking-wide text-black uppercase flex items-center gap-4">
@@ -666,17 +730,24 @@ export default function App() {
             VERTICAL
           </h2>
 
-          {filteredVerticalVideos.length > 0 ? (
+          {loading ? (
+            <ShimmerGrid count={5} aspect="vertical" cols={5} />
+          ) : filteredVerticalVideos.length > 0 ? (
             <>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-0">
                 {filteredVerticalVideos.slice(0, colsPortrait * 2).map((item) => (
-                  <div key={item.id} className="group cursor-pointer w-full" onClick={() => setPlayingItem(item)}>
+                  <div key={item.id} className="group cursor-pointer w-full relative overflow-hidden" onClick={() => setPlayingItem(item)}>
                     <div className="relative aspect-[9/16] overflow-hidden bg-neutral-200">
                       <ImageWithFallback src={item.image} fallbackSrc={item.fallbackSrc} alt={item.title}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent flex flex-col justify-end p-6 opacity-0 group-hover:opacity-100 transition-all duration-500">
-                        <h3 className="text-white text-lg font-bold translate-y-2 group-hover:translate-y-0 transition-transform duration-300">{item.title}</h3>
-                        <div className="flex gap-2 flex-wrap mt-2 translate-y-2 group-hover:translate-y-0 transition-transform duration-300 delay-75">
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+                        <div className="w-12 h-12 rounded-full bg-white/25 backdrop-blur-md border border-white/30 flex items-center justify-center text-white scale-75 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300 shadow-xl group-hover:rotate-6">
+                          <Play size={18} fill="currentColor" className="ml-0.5" />
+                        </div>
+                      </div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent flex flex-col justify-end p-6 opacity-0 group-hover:opacity-100 transition-all duration-400">
+                        <h3 className="text-white text-lg font-bold translate-y-3 group-hover:translate-y-0 transition-transform duration-300">{item.title}</h3>
+                        <div className="flex gap-2 flex-wrap mt-2 translate-y-3 group-hover:translate-y-0 transition-transform duration-300 delay-75">
                           {item.tags.map((tag) => (
                             <span key={tag} className="px-2 py-0.5 bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold uppercase tracking-widest">{tag}</span>
                           ))}
@@ -689,20 +760,21 @@ export default function App() {
               {filteredVerticalVideos.length > colsPortrait * 2 && (
                 <div className="flex justify-center mt-16">
                   <button onClick={() => { setCurrentPage('portrait-cinema'); window.scrollTo({ top: 0, behavior: 'instant' }); }}
-                    className="px-12 py-5 border border-black text-[11px] font-bold uppercase tracking-[0.2em] text-black hover:bg-black hover:text-white transition-all duration-300 rounded-full cursor-pointer">
+                    className="px-12 py-5 border border-black text-[11px] font-bold uppercase tracking-[0.2em] text-black hover:bg-black hover:text-white transition-all duration-300 rounded-full cursor-pointer btn-tactile hover:shadow-lg">
                     See More
                   </button>
                 </div>
               )}
             </>
           ) : (
-            <div className="py-20 text-center border border-dashed border-black/10">
+            <div className="py-20 text-center border border-dashed border-black/10 rounded-xl">
               <p className="text-black/40 uppercase tracking-[0.2em] text-xs font-bold">No vertical works found.</p>
             </div>
           )}
         </div>
       </section>
 
+      {/* ─── 04 Cinematography Works ─── */}
       <section id="cinematography" className="py-20 px-6 lg:px-8 bg-white border-t border-black/5">
         <div className="max-w-7xl mx-auto">
           <h2 className="mb-12 text-2xl font-joyride font-normal tracking-wide text-black uppercase flex items-center gap-4">
@@ -710,17 +782,24 @@ export default function App() {
             CINEMATOGRAPHY
           </h2>
 
-          {cinematographyWorks.length > 0 ? (
+          {loading ? (
+            <ShimmerGrid count={3} aspect="video" cols={3} />
+          ) : cinematographyWorks.length > 0 ? (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0">
                 {cinematographyWorks.slice(0, colsCreative * 3).map((item) => (
-                  <div key={item.id} className="group cursor-pointer" onClick={() => setPlayingItem(item)}>
+                  <div key={item.id} className="group cursor-pointer relative overflow-hidden" onClick={() => setPlayingItem(item)}>
                     <div className={`relative ${item.category === 'VERTICAL' ? 'aspect-[9/16]' : 'aspect-video'} overflow-hidden bg-neutral-200`}>
                       <ImageWithFallback src={item.image} fallbackSrc={item.fallbackSrc} alt={item.title}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-6 opacity-0 group-hover:opacity-100 transition-all duration-500">
-                        <h3 className="text-white mb-2 text-xl font-bold translate-y-2 group-hover:translate-y-0 transition-transform duration-300">{item.title}</h3>
-                        <div className="flex gap-2 flex-wrap translate-y-2 group-hover:translate-y-0 transition-transform duration-300 delay-75">
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+                        <div className="w-12 h-12 rounded-full bg-white/25 backdrop-blur-md border border-white/30 flex items-center justify-center text-white scale-75 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300 shadow-xl group-hover:rotate-6">
+                          <Play size={18} fill="currentColor" className="ml-0.5" />
+                        </div>
+                      </div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent flex flex-col justify-end p-6 opacity-0 group-hover:opacity-100 transition-all duration-400">
+                        <h3 className="text-white mb-2 text-xl font-bold translate-y-3 group-hover:translate-y-0 transition-transform duration-300">{item.title}</h3>
+                        <div className="flex gap-2 flex-wrap translate-y-3 group-hover:translate-y-0 transition-transform duration-300 delay-75">
                           {item.tags.map((tag) => (
                             <span key={tag} className="px-2 py-0.5 bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold uppercase tracking-widest">{tag}</span>
                           ))}
@@ -733,24 +812,24 @@ export default function App() {
               {cinematographyWorks.length > colsCreative * 3 && (
                 <div className="flex justify-center mt-16">
                   <button onClick={() => { setCurrentPage('cinematography'); window.scrollTo({ top: 0, behavior: 'instant' }); }}
-                    className="px-12 py-5 border border-black text-[11px] font-bold uppercase tracking-[0.2em] text-black hover:bg-black hover:text-white transition-all duration-300 rounded-full cursor-pointer">
+                    className="px-12 py-5 border border-black text-[11px] font-bold uppercase tracking-[0.2em] text-black hover:bg-black hover:text-white transition-all duration-300 rounded-full cursor-pointer btn-tactile hover:shadow-lg">
                     See More
                   </button>
                 </div>
               )}
             </>
           ) : (
-            <div className="py-20 text-center border border-dashed border-black/10">
+            <div className="py-20 text-center border border-dashed border-black/10 rounded-xl">
               <p className="text-black/40 uppercase tracking-[0.2em] text-xs font-bold">No cinematography works found.</p>
             </div>
           )}
         </div>
       </section>
 
-      {playingItem && <VideoModal item={playingItem} onClose={() => setPlayingItem(null)} />}
-
+      {/* Marquee component */}
       <Marquee />
 
+      {/* About Section */}
       <section id="about" className="py-32 px-6 lg:px-8 border-t border-black/5 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-24">
@@ -759,20 +838,53 @@ export default function App() {
                 <span className="text-sm px-3.5 py-1 font-bold font-sans bg-black text-white rounded-full">05</span>
                 ABOUT
               </h2>
-              <p className="text-4xl md:text-5xl font-light tracking-tight leading-[1.1] text-black">
-                Mumbai-based creative with a sharp eye for storytelling through <span className="italic">motion</span> and <span className="italic font-medium bg-gradient-to-r from-blue-600 via-purple-500 to-orange-500 bg-clip-text text-transparent">color</span>.
-              </p>
+              <div className="space-y-8 text-neutral-800 text-lg md:text-xl font-light leading-relaxed">
+                <p>
+                  I'm Kshitij Rathore, a visual artist, filmmaker, and post-production specialist with over 7 years of experience crafting high-impact commercials, music videos, and cinematic promos.
+                </p>
+                <p>
+                  My work lives at the intersection of raw emotion and surgical precision. From high-energy brand campaigns to moody narrative pieces, I approach every frame with obsessive attention to color, pacing, and visual story.
+                </p>
+                <p>
+                  Over the years, I've had the privilege of collaborating with top brands including Netflix, Amazon Prime Video, Disney+ Hotstar, Swiggy, and CRED, working alongside legendary talents and cutting-edge creators across India.
+                </p>
+              </div>
+
+              <div className="pt-8 border-t border-black/10 grid grid-cols-2 sm:grid-cols-3 gap-8">
+                <div>
+                  <h4 className="text-3xl font-light tracking-tight text-black mb-1">7+</h4>
+                  <p className="text-xs uppercase tracking-widest text-neutral-500 font-bold">Years Experience</p>
+                </div>
+                <div>
+                  <h4 className="text-3xl font-light tracking-tight text-black mb-1">100+</h4>
+                  <p className="text-xs uppercase tracking-widest text-neutral-500 font-bold">Projects Delivered</p>
+                </div>
+                <div>
+                  <h4 className="text-3xl font-light tracking-tight text-black mb-1">50M+</h4>
+                  <p className="text-xs uppercase tracking-widest text-neutral-500 font-bold">Views Generated</p>
+                </div>
+              </div>
             </div>
-            <div className="flex flex-col justify-end space-y-10">
-              <p className="text-xl text-black/70 leading-relaxed max-w-xl">
-                Spending most of my time turning ideas into moving images, shooting them, editing them, grading them, and occasionally losing sleep over tiny creative decisions. Worth it every time.
-              </p>
+
+            <div className="relative">
+              <div className="aspect-[4/5] bg-neutral-100 overflow-hidden rounded-2xl relative shadow-2xl">
+                <ImageWithFallback
+                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1000&auto=format&fit=crop"
+                  alt="Kshitij Rathore Portrait"
+                  className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-8">
+                  <p className="text-white text-xs uppercase tracking-[0.25em] font-bold">Mumbai &bull; Available Worldwide</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       <Footer />
+
+      {playingItem && <VideoModal item={playingItem} onClose={() => setPlayingItem(null)} />}
     </div>
   );
 }

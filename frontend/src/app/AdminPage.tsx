@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import {
   ChevronLeft, ChevronRight, X, Film, Edit3, Trash2, Plus, Upload,
   GripVertical, Star, StarOff, Save, Check, ArrowUp, ArrowDown, LogOut,
-  ExternalLink, Eye, RefreshCw, AlertCircle
+  ExternalLink, Eye, RefreshCw, AlertCircle, Play, ArrowLeft
 } from 'lucide-react';
 import { ImageWithFallback } from './components/figma/ImageWithFallback';
 import { Marquee } from './components/Marquee';
@@ -33,6 +33,7 @@ import {
   adminLogout
 } from '@/lib/api';
 import { transformWork, DisplayWorkItem } from '@/lib/transformWork';
+import { ShimmerCarousel, ShimmerGrid, ShimmerFilters } from './components/Shimmer';
 
 function Footer() {
   return (
@@ -74,23 +75,27 @@ function Footer() {
   );
 }
 
-// ─── Toast Notification ───────────────────────────────────────────────────────
+// ─── Toast Notification with Micro-Interaction ────────────────────────────────
 function Toast({ message, type, onClose }: { message: string; type: 'success' | 'error' | 'info'; onClose: () => void }) {
   return (
-    <div className={`fixed bottom-6 right-6 z-[200] flex items-center gap-3 px-5 py-3 rounded-full shadow-2xl backdrop-blur-md border text-sm font-medium transition-all ${
-      type === 'success' ? 'bg-emerald-950/90 border-emerald-500/30 text-emerald-300' :
-      type === 'error' ? 'bg-rose-950/90 border-rose-500/30 text-rose-300' :
-      'bg-neutral-900/90 border-white/20 text-white'
-    }`}>
-      {type === 'success' && <Check size={16} />}
-      {type === 'error' && <AlertCircle size={16} />}
+    <div
+      className={`fixed bottom-6 right-6 z-[200] flex items-center gap-3 px-5 py-3 rounded-full shadow-2xl backdrop-blur-md border text-sm font-medium transition-all animate-in slide-in-from-bottom-5 duration-300 ${
+        type === 'success' ? 'bg-emerald-950/90 border-emerald-500/30 text-emerald-300' :
+        type === 'error' ? 'bg-rose-950/90 border-rose-500/30 text-rose-300' :
+        'bg-neutral-900/90 border-white/20 text-white'
+      }`}
+    >
+      {type === 'success' && <Check size={16} className="text-emerald-400" />}
+      {type === 'error' && <AlertCircle size={16} className="text-rose-400" />}
       <span>{message}</span>
-      <button onClick={onClose} className="ml-2 hover:opacity-75"><X size={14} /></button>
+      <button onClick={onClose} className="ml-2 hover:opacity-75 transition-opacity cursor-pointer">
+        <X size={14} />
+      </button>
     </div>
   );
 }
 
-// ─── Edit / Create Modal ──────────────────────────────────────────────────────
+// ─── Edit / Create Modal with Shimmer Upload Bar ───────────────────────────────
 function WorkModal({
   work,
   isOpen,
@@ -186,19 +191,35 @@ function WorkModal({
   };
 
   return (
-    <div className="fixed inset-0 z-[150] bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="bg-[#121212] border border-white/20 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 md:p-8 text-white shadow-2xl relative">
+    <div className="fixed inset-0 z-[150] bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
+      <div className="bg-[#121212] border border-white/20 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 md:p-8 text-white shadow-2xl relative scale-100 animate-in zoom-in-95 duration-200">
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 text-white/50 hover:text-white p-2 rounded-full hover:bg-white/10 transition-colors"
+          className="absolute top-5 right-5 text-white/50 hover:text-white p-2 rounded-full hover:bg-white/10 transition-all hover:rotate-90 duration-300"
         >
           <X size={20} />
         </button>
 
         <h3 className="text-xl font-bold tracking-tight mb-6 flex items-center gap-2">
-          {work ? <Edit3 size={18} className="text-yellow-400" /> : <Plus size={18} className="text-emerald-400" />}
+          {work ? <Edit3 size={18} className="text-amber-400" /> : <Plus size={18} className="text-emerald-400" />}
           {work ? 'Edit Project Details' : 'Add New Project'}
         </h3>
+
+        {/* Shimmer progress banner while uploading */}
+        {(uploadingVideo || uploading) && (
+          <div className="mb-5 p-3.5 bg-amber-500/10 border border-amber-500/25 rounded-xl flex flex-col gap-2">
+            <div className="flex items-center justify-between text-xs text-amber-300 font-medium">
+              <span className="flex items-center gap-2">
+                <Upload size={14} className="animate-bounce" />
+                {uploadingVideo ? 'Streaming video directly to cloud storage...' : 'Uploading image asset...'}
+              </span>
+              <span className="text-[10px] uppercase tracking-wider text-amber-400 font-bold">Please wait</span>
+            </div>
+            <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
+              <div className="h-full bg-amber-400 rounded-full animate-shimmer w-full" />
+            </div>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
@@ -209,7 +230,7 @@ function WorkModal({
               onChange={e => setTitle(e.target.value)}
               placeholder="e.g. Stree 2 Promo | Prime Video"
               required
-              className="w-full bg-white/5 border border-white/15 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-white/50 transition-colors"
+              className="w-full bg-white/5 border border-white/15 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/30 transition-all"
             />
           </div>
 
@@ -219,7 +240,7 @@ function WorkModal({
               <select
                 value={category}
                 onChange={e => setCategory(e.target.value as any)}
-                className="w-full bg-[#1e1e1e] border border-white/15 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-white/50 cursor-pointer"
+                className="w-full bg-[#1e1e1e] border border-white/15 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400 cursor-pointer"
               >
                 <option value="HORIZONTAL">Horizontal (16:9)</option>
                 <option value="VERTICAL">Vertical (9:16 Reel/Short)</option>
@@ -230,12 +251,12 @@ function WorkModal({
               <button
                 type="button"
                 onClick={() => setFeatured(!featured)}
-                className={`w-full py-2.5 px-4 rounded-lg border text-sm font-bold flex items-center justify-center gap-2 transition-all ${
-                  featured ? 'bg-amber-400/20 border-amber-400/50 text-amber-300' : 'bg-white/5 border-white/15 text-white/50 hover:bg-white/10'
+                className={`w-full py-2.5 px-4 rounded-lg border text-sm font-bold flex items-center justify-center gap-2 transition-all btn-tactile ${
+                  featured ? 'bg-amber-400/20 border-amber-400/50 text-amber-300 shadow-[0_0_15px_rgba(251,191,36,0.2)]' : 'bg-white/5 border-white/15 text-white/50 hover:bg-white/10'
                 }`}
               >
                 {featured ? <Star size={16} fill="currentColor" /> : <StarOff size={16} />}
-                {featured ? 'Featured in 01 Recent' : 'Not Featured'}
+                {featured ? '★ Featured in 01 Recent' : 'Not Featured'}
               </button>
             </div>
           </div>
@@ -247,7 +268,7 @@ function WorkModal({
               value={tags}
               onChange={e => setTags(e.target.value)}
               placeholder="EDITOR, COLORIST, DOP, MOTION"
-              className="w-full bg-white/5 border border-white/15 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-white/50 transition-colors"
+              className="w-full bg-white/5 border border-white/15 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/30 transition-all"
             />
           </div>
 
@@ -258,7 +279,7 @@ function WorkModal({
                 type="button"
                 onClick={() => videoFileInputRef.current?.click()}
                 disabled={uploadingVideo}
-                className="text-xs text-amber-400 hover:text-amber-300 flex items-center gap-1.5 cursor-pointer font-medium"
+                className="text-xs text-amber-400 hover:text-amber-300 flex items-center gap-1.5 cursor-pointer font-medium btn-tactile"
               >
                 <Upload size={13} />
                 {uploadingVideo ? 'Uploading Video...' : 'Upload Video File (.mp4, .webm)'}
@@ -283,7 +304,7 @@ function WorkModal({
                 setVideoLink(val);
               }}
               placeholder="Paste YouTube / Instagram link or click 'Upload Video File' above"
-              className="w-full bg-white/5 border border-white/15 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-white/50 transition-colors"
+              className="w-full bg-white/5 border border-white/15 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/30 transition-all"
             />
             <p className="text-[11px] text-white/40 mt-1">
               Supports <strong>YouTube</strong>, <strong>Instagram</strong>, or direct <strong>video upload</strong> (played with high-performance HTML5 + Mux Data).
@@ -297,7 +318,7 @@ function WorkModal({
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
-                className="text-xs text-amber-400 hover:text-amber-300 flex items-center gap-1.5 cursor-pointer font-medium"
+                className="text-xs text-amber-400 hover:text-amber-300 flex items-center gap-1.5 cursor-pointer font-medium btn-tactile"
               >
                 <Upload size={13} />
                 {uploading ? 'Uploading...' : 'Upload File / Video'}
@@ -315,7 +336,7 @@ function WorkModal({
               value={imageThumbnailLink}
               onChange={e => setImageThumbnailLink(e.target.value)}
               placeholder="https://drive.google.com/... or uploaded url"
-              className="w-full bg-white/5 border border-white/15 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-white/50 transition-colors"
+              className="w-full bg-white/5 border border-white/15 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/30 transition-all"
             />
           </div>
 
@@ -323,17 +344,26 @@ function WorkModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2.5 rounded-lg border border-white/20 text-white/70 hover:text-white text-xs font-bold uppercase tracking-widest transition-colors cursor-pointer"
+              className="px-5 py-2.5 border border-white/20 hover:bg-white/5 rounded-lg text-xs font-bold uppercase tracking-widest text-white/70 hover:text-white transition-all cursor-pointer btn-tactile"
             >
               Cancel
             </button>
             <button
               type="submit"
-              disabled={saving}
-              className="px-6 py-2.5 rounded-lg bg-white text-black hover:bg-neutral-200 text-xs font-bold uppercase tracking-widest flex items-center gap-2 transition-all cursor-pointer shadow-lg disabled:opacity-50"
+              disabled={saving || uploading || uploadingVideo}
+              className="px-6 py-2.5 bg-white text-black hover:bg-neutral-200 rounded-lg text-xs font-bold uppercase tracking-widest flex items-center gap-2 transition-all cursor-pointer shadow-lg disabled:opacity-50 btn-tactile"
             >
-              <Save size={15} />
-              {saving ? 'Saving...' : 'Save Changes'}
+              {saving ? (
+                <>
+                  <RefreshCw size={14} className="animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save size={14} />
+                  Save Project
+                </>
+              )}
             </button>
           </div>
         </form>
@@ -342,10 +372,10 @@ function WorkModal({
   );
 }
 
-// ─── Main Admin Component ─────────────────────────────────────────────────────
+// ─── MAIN ADMIN VISUAL EDITOR COMPONENT ───────────────────────────────────────
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState('admin');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
@@ -355,55 +385,40 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [activeFilters, setActiveFilters] = useState<string[]>(['all']);
   const [playingItem, setPlayingItem] = useState<DisplayWorkItem | null>(null);
+
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 4000);
+  };
+
+  // Modal edit/create state
   const [editModalItem, setEditModalItem] = useState<DisplayWorkItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
-
-  // Subpage navigation matching frontend
-  const [currentPage, setCurrentPage] = useState<'home' | 'creative-archive' | 'portrait-cinema' | 'cinematography'>('home');
-  const [colsCreative, setColsCreative] = useState(3);
-  const [colsPortrait, setColsPortrait] = useState(5);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Drag and drop state
   const [draggedItemId, setDraggedItemId] = useState<number | null>(null);
   const [dragOverItemId, setDragOverItemId] = useState<number | null>(null);
 
-  // Hidden upload ref for quick tile upload
-  const tileUploadRef = useRef<HTMLInputElement>(null);
+  // Tile direct upload state
   const [tileUploadTargetId, setTileUploadTargetId] = useState<number | null>(null);
+  const tileFileInputRef = useRef<HTMLInputElement>(null);
 
+  // UI Navigation matching public site
+  const [scrolled, setScrolled] = useState(false);
+  const [currentPage, setCurrentPage] = useState<'home' | 'creative-archive' | 'portrait-cinema' | 'cinematography'>('home');
+  const [colsCreative, setColsCreative] = useState(3);
+  const [colsPortrait, setColsPortrait] = useState(5);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3500);
-  };
-
   useEffect(() => {
-    const handleResize = () => {
-      const w = window.innerWidth;
-      if (w >= 1024) setColsCreative(3);
-      else if (w >= 768) setColsCreative(2);
-      else setColsCreative(1);
-
-      if (w >= 1280) setColsPortrait(5);
-      else if (w >= 1024) setColsPortrait(4);
-      else if (w >= 768) setColsPortrait(3);
-      else setColsPortrait(2);
-    };
-
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  // Auth check
-  useEffect(() => {
-    verifyToken().then(valid => {
+    const checkAuth = async () => {
+      const valid = await verifyToken();
       setIsAuthenticated(valid);
       if (valid) loadWorks();
-    });
+    };
+    checkAuth();
   }, []);
 
   const loadWorks = async () => {
@@ -427,6 +442,7 @@ export default function AdminPage() {
       await adminLogin(username, password);
       setIsAuthenticated(true);
       loadWorks();
+      showToast('Authenticated successfully', 'success');
     } catch (err: any) {
       setLoginError(err.message || 'Login failed');
     } finally {
@@ -439,16 +455,42 @@ export default function AdminPage() {
     setIsAuthenticated(false);
   };
 
-  // Drag and Drop ordering handler
+  const handleSaveWork = async (workData: Partial<NewWorkItem>) => {
+    try {
+      if (editModalItem) {
+        await updateWork(editModalItem.id, workData);
+        showToast('Project updated successfully', 'success');
+      } else {
+        await createWork(workData as NewWorkItem);
+        showToast('New project created successfully', 'success');
+      }
+      loadWorks();
+    } catch (err: any) {
+      showToast('Failed to save project: ' + err.message, 'error');
+      throw err;
+    }
+  };
+
+  const handleDeleteWork = async (item: DisplayWorkItem, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!window.confirm(`Are you sure you want to delete "${item.title}"?`)) return;
+
+    try {
+      await deleteWork(item.id);
+      setData(prev => prev.filter(w => w.id !== item.id));
+      showToast('Project deleted successfully', 'success');
+    } catch (err: any) {
+      showToast('Failed to delete work: ' + err.message, 'error');
+    }
+  };
+
   const handleDragStart = (e: React.DragEvent, id: number) => {
     setDraggedItemId(id);
     e.dataTransfer.setData('text/plain', String(id));
-    e.dataTransfer.effectAllowed = 'move';
   };
 
   const handleDragOver = (e: React.DragEvent, id: number) => {
     e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
     if (dragOverItemId !== id) {
       setDragOverItemId(id);
     }
@@ -456,96 +498,88 @@ export default function AdminPage() {
 
   const handleDrop = async (e: React.DragEvent, targetId: number) => {
     e.preventDefault();
-    setDragOverItemId(null);
-    if (!draggedItemId || draggedItemId === targetId) return;
+    if (draggedItemId === null || draggedItemId === targetId) {
+      setDraggedItemId(null);
+      setDragOverItemId(null);
+      return;
+    }
 
-    const sourceIndex = data.findIndex(d => d.id === draggedItemId);
-    const targetIndex = data.findIndex(d => d.id === targetId);
-    if (sourceIndex === -1 || targetIndex === -1) return;
+    const currentList = [...data];
+    const draggedIndex = currentList.findIndex(item => item.id === draggedItemId);
+    const targetIndex = currentList.findIndex(item => item.id === targetId);
 
-    const reordered = [...data];
-    const [moved] = reordered.splice(sourceIndex, 1);
-    reordered.splice(targetIndex, 0, moved);
+    if (draggedIndex === -1 || targetIndex === -1) return;
 
-    const updatedWithOrder = reordered.map((item, index) => ({
+    const [movedItem] = currentList.splice(draggedIndex, 1);
+    currentList.splice(targetIndex, 0, movedItem);
+
+    const updatedWithOrder = currentList.map((item, index) => ({
       ...item,
-      displayOrder: index + 1,
+      displayOrder: index,
     }));
 
     setData(updatedWithOrder);
     setDraggedItemId(null);
+    setDragOverItemId(null);
 
+    showToast('Reordering saved', 'info');
     try {
       await reorderWorks(updatedWithOrder.map(item => ({ id: item.id, displayOrder: item.displayOrder })));
-      showToast('New position saved successfully!');
+      showToast('Order synchronized with database', 'success');
     } catch (err: any) {
       showToast('Failed to save order: ' + err.message, 'error');
       loadWorks();
     }
   };
 
-  // Move up or down programmatically
   const moveItem = async (id: number, direction: 'up' | 'down') => {
-    const currentIndex = data.findIndex(d => d.id === id);
-    if (currentIndex === -1) return;
-    const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
-    if (targetIndex < 0 || targetIndex >= data.length) return;
+    const currentList = [...data];
+    const index = currentList.findIndex(item => item.id === id);
+    if (index === -1) return;
 
-    const reordered = [...data];
-    const [moved] = reordered.splice(currentIndex, 1);
-    reordered.splice(targetIndex, 0, moved);
+    if (direction === 'up' && index === 0) return;
+    if (direction === 'down' && index === currentList.length - 1) return;
 
-    const updatedWithOrder = reordered.map((item, index) => ({
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    const [movedItem] = currentList.splice(index, 1);
+    currentList.splice(targetIndex, 0, movedItem);
+
+    const updatedWithOrder = currentList.map((item, i) => ({
       ...item,
-      displayOrder: index + 1,
+      displayOrder: i,
     }));
 
     setData(updatedWithOrder);
+
     try {
       await reorderWorks(updatedWithOrder.map(item => ({ id: item.id, displayOrder: item.displayOrder })));
-      showToast(`Moved ${direction === 'up' ? 'earlier' : 'later'}!`);
+      showToast('Order updated', 'success');
     } catch (err: any) {
-      showToast('Failed to save order', 'error');
+      showToast('Failed to update order: ' + err.message, 'error');
       loadWorks();
     }
   };
 
-  // Save or Create work
-  const handleSaveWork = async (formData: Partial<NewWorkItem>) => {
-    if (editModalItem) {
-      const updated = await updateWork(editModalItem.id, formData);
-      setData(prev => prev.map(item => (item.id === updated.id ? transformWork(updated) : item)));
-      showToast('Project updated successfully!');
-    } else {
-      const created = await createWork({
-        ...formData,
-        title: formData.title || 'Untitled Project',
-        displayOrder: 1,
-      } as NewWorkItem);
-      const transformed = transformWork(created);
-      setData(prev => [transformed, ...prev]);
-      showToast('New project created!');
-    }
-  };
+  const toggleFeatured = async (item: DisplayWorkItem, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const newFeatured = !item.featured;
+    setData(prev =>
+      prev.map(w => (w.id === item.id ? { ...w, featured: newFeatured } : w))
+    );
 
-  // Delete work
-  const handleDeleteWork = async (item: DisplayWorkItem, e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    if (!window.confirm(`Are you sure you want to delete "${item.title}"?`)) return;
     try {
-      await deleteWork(item.id);
-      setData(prev => prev.filter(w => w.id !== item.id));
-      showToast('Project deleted successfully');
+      await updateWork(item.id, { featured: newFeatured });
+      showToast(newFeatured ? 'Added to Recent Carousel' : 'Removed from Recent', 'success');
     } catch (err: any) {
-      showToast('Failed to delete project: ' + err.message, 'error');
+      showToast('Failed to update featured: ' + err.message, 'error');
+      loadWorks();
     }
   };
 
-  // Quick Tile Upload
   const triggerTileUpload = (id: number, e: React.MouseEvent) => {
     e.stopPropagation();
     setTileUploadTargetId(id);
-    tileUploadRef.current?.click();
+    tileFileInputRef.current?.click();
   };
 
   const handleTileFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -556,19 +590,23 @@ export default function AdminPage() {
     try {
       const res = await uploadMediaFile(file);
       const isVideo = file.type.startsWith('video/');
-      const payload = isVideo ? { videoLink: res.url } : { imageThumbnailLink: res.url };
-      const updated = await updateWork(tileUploadTargetId, payload);
-      setData(prev => prev.map(item => (item.id === updated.id ? transformWork(updated) : item)));
-      showToast(isVideo ? 'Video updated successfully!' : 'Thumbnail updated successfully!');
+
+      if (isVideo) {
+        await updateWork(tileUploadTargetId, { videoLink: res.url });
+        showToast('Video linked to project', 'success');
+      } else {
+        await updateWork(tileUploadTargetId, { imageThumbnailLink: res.url });
+        showToast('Thumbnail updated for project', 'success');
+      }
+      loadWorks();
     } catch (err: any) {
       showToast('Upload failed: ' + err.message, 'error');
     } finally {
-      if (tileUploadRef.current) tileUploadRef.current.value = '';
+      if (tileFileInputRef.current) tileFileInputRef.current.value = '';
       setTileUploadTargetId(null);
     }
   };
 
-  // Video embed helpers
   const getEmbedUrl = (url: string) => {
     if (!url) return '';
     if (url.includes('youtube.com') || url.includes('youtu.be')) {
@@ -586,26 +624,44 @@ export default function AdminPage() {
       const baseUrl = url.split('?')[0];
       return baseUrl.endsWith('/') ? `${baseUrl}embed` : `${baseUrl}/embed`;
     }
-    // Disallow Google Drive embed player
     return url;
   };
 
   const isDirectVideo = (url: string) => {
     if (!url) return false;
-    const lower = url.toLowerCase();
+    const lowerUrl = url.toLowerCase();
     return (
-      lower.includes('mux.com') ||
-      lower.includes('.m3u8') ||
-      lower.startsWith('/uploads/') ||
-      lower.endsWith('.mp4') ||
-      lower.endsWith('.webm') ||
-      lower.endsWith('.ogg') ||
-      lower.includes('/uploads/') ||
-      lower.includes('cloudinary.com')
+      lowerUrl.includes('mux.com') ||
+      lowerUrl.includes('.m3u8') ||
+      lowerUrl.startsWith('/uploads/') ||
+      lowerUrl.endsWith('.mp4') ||
+      lowerUrl.endsWith('.webm') ||
+      lowerUrl.endsWith('.ogg') ||
+      lowerUrl.includes('cloudinary.com') ||
+      lowerUrl.includes('.mp4?') ||
+      lowerUrl.includes('.webm?') ||
+      lowerUrl.includes('.ogg?')
     );
   };
 
-  // Filter helpers
+  useEffect(() => {
+    const handleResize = () => {
+      const w = window.innerWidth;
+      if (w >= 1024) setColsCreative(3);
+      else if (w >= 768) setColsCreative(2);
+      else setColsCreative(1);
+
+      if (w >= 1280) setColsPortrait(5);
+      else if (w >= 1024) setColsPortrait(4);
+      else if (w >= 768) setColsPortrait(3);
+      else setColsPortrait(2);
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const toggleFilter = (filter: string) => {
     if (filter === 'all') {
       setActiveFilters(['all']);
@@ -649,10 +705,10 @@ export default function AdminPage() {
   if (isAuthenticated === false) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center p-6 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.05)_0,transparent_70%)] pointer-events-none" />
-        <div className="w-full max-w-md bg-[#111] border border-white/10 rounded-2xl p-8 relative z-10 shadow-2xl">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.06)_0,transparent_70%)] pointer-events-none" />
+        <div className="w-full max-w-md bg-[#111] border border-white/10 rounded-2xl p-8 relative z-10 shadow-2xl card-hover-lift">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-white text-black font-black text-xl flex items-center justify-center rounded">K</div>
+            <div className="w-10 h-10 bg-white text-black font-black text-xl flex items-center justify-center rounded shadow-md">K</div>
             <div>
               <h2 className="text-sm font-bold tracking-widest uppercase">Admin Dashboard</h2>
               <p className="text-white/40 text-xs uppercase tracking-wider">Live Visual Editor</p>
@@ -660,7 +716,7 @@ export default function AdminPage() {
           </div>
 
           {loginError && (
-            <div className="mb-6 p-3 bg-rose-950/50 border border-rose-500/30 text-rose-300 text-xs rounded-lg">
+            <div className="mb-6 p-3 bg-rose-950/50 border border-rose-500/30 text-rose-300 text-xs rounded-lg animate-in fade-in duration-200">
               {loginError}
             </div>
           )}
@@ -674,7 +730,7 @@ export default function AdminPage() {
                 onChange={e => setUsername(e.target.value)}
                 placeholder="admin"
                 required
-                className="w-full bg-[#1c1c1c] border border-white/10 text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-white/40"
+                className="w-full bg-[#1c1c1c] border border-white/10 text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/20 transition-all"
               />
             </div>
             <div>
@@ -685,13 +741,13 @@ export default function AdminPage() {
                 onChange={e => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
-                className="w-full bg-[#1c1c1c] border border-white/10 text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-white/40"
+                className="w-full bg-[#1c1c1c] border border-white/10 text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/20 transition-all"
               />
             </div>
             <button
               type="submit"
               disabled={loginLoading}
-              className="w-full py-3.5 bg-white text-black rounded-lg font-bold text-xs uppercase tracking-widest hover:bg-neutral-200 transition-all cursor-pointer mt-4"
+              className="w-full py-3.5 bg-white text-black rounded-lg font-bold text-xs uppercase tracking-widest hover:bg-neutral-200 transition-all cursor-pointer mt-4 shadow-lg btn-tactile disabled:opacity-50"
             >
               {loginLoading ? 'Authenticating...' : 'Sign In to Visual Editor'}
             </button>
@@ -718,16 +774,16 @@ export default function AdminPage() {
         onDragStart={e => handleDragStart(e, item.id)}
         onDragOver={e => handleDragOver(e, item.id)}
         onDrop={e => handleDrop(e, item.id)}
-        className={`group relative overflow-hidden bg-neutral-200 transition-all select-none cursor-grab active:cursor-grabbing border ${
-          isOver ? 'border-amber-400 ring-2 ring-amber-400 scale-[0.98]' : 'border-transparent'
-        } ${isDragged ? 'opacity-40' : 'opacity-100'}`}
+        className={`group relative overflow-hidden bg-neutral-200 transition-all duration-300 select-none cursor-grab active:cursor-grabbing border ${
+          isOver ? 'border-amber-400 ring-4 ring-amber-400/50 scale-[0.98]' : 'border-transparent'
+        } ${isDragged ? 'opacity-30 scale-95' : 'opacity-100 hover:scale-[1.01] hover:z-20'}`}
       >
         {/* Floating Quick Action Toolbar */}
         <div className="absolute top-3 right-3 z-30 flex items-center gap-1.5 opacity-90 group-hover:opacity-100 transition-opacity">
           {/* Drag handle pill */}
           <div
             title="Drag to reposition anywhere"
-            className="p-1.5 bg-black/80 hover:bg-black text-white/80 hover:text-white rounded-md backdrop-blur-md border border-white/10 cursor-grab active:cursor-grabbing shadow-lg"
+            className="p-1.5 bg-black/80 hover:bg-black text-white/80 hover:text-white rounded-md backdrop-blur-md border border-white/10 cursor-grab active:cursor-grabbing shadow-lg btn-tactile"
           >
             <GripVertical size={14} />
           </div>
@@ -736,7 +792,7 @@ export default function AdminPage() {
           <button
             onClick={e => triggerTileUpload(item.id, e)}
             title="Quick Upload Video / Thumbnail File"
-            className="p-1.5 bg-black/80 hover:bg-emerald-600 text-white rounded-md backdrop-blur-md border border-white/10 transition-colors shadow-lg cursor-pointer"
+            className="p-1.5 bg-black/80 hover:bg-emerald-600 text-white rounded-md backdrop-blur-md border border-white/10 transition-colors shadow-lg cursor-pointer btn-tactile"
           >
             <Upload size={14} />
           </button>
@@ -749,16 +805,29 @@ export default function AdminPage() {
               setIsModalOpen(true);
             }}
             title="Edit Details"
-            className="p-1.5 bg-black/80 hover:bg-amber-500 text-white rounded-md backdrop-blur-md border border-white/10 transition-colors shadow-lg cursor-pointer"
+            className="p-1.5 bg-black/80 hover:bg-amber-500 text-white rounded-md backdrop-blur-md border border-white/10 transition-colors shadow-lg cursor-pointer btn-tactile"
           >
             <Edit3 size={14} />
+          </button>
+
+          {/* Toggle Featured */}
+          <button
+            onClick={e => toggleFeatured(item, e)}
+            title={item.featured ? 'Remove from Featured Recent Carousel' : 'Feature in Recent Carousel'}
+            className={`p-1.5 rounded-md backdrop-blur-md border shadow-lg transition-colors cursor-pointer btn-tactile ${
+              item.featured
+                ? 'bg-amber-500 text-black border-amber-400 font-bold'
+                : 'bg-black/80 hover:bg-neutral-800 text-white/70 hover:text-white border-white/10'
+            }`}
+          >
+            <Star size={14} fill={item.featured ? 'currentColor' : 'none'} />
           </button>
 
           {/* Delete button */}
           <button
             onClick={e => handleDeleteWork(item, e)}
             title="Delete Project"
-            className="p-1.5 bg-black/80 hover:bg-rose-600 text-white rounded-md backdrop-blur-md border border-white/10 transition-colors shadow-lg cursor-pointer"
+            className="p-1.5 bg-black/80 hover:bg-rose-600 text-white rounded-md backdrop-blur-md border border-white/10 transition-colors shadow-lg cursor-pointer btn-tactile"
           >
             <Trash2 size={14} />
           </button>
@@ -769,14 +838,14 @@ export default function AdminPage() {
           <button
             onClick={e => { e.stopPropagation(); moveItem(item.id, 'up'); }}
             title="Move earlier in list"
-            className="p-1.5 bg-black/80 hover:bg-black text-white/80 hover:text-white rounded-md backdrop-blur-md border border-white/10 cursor-pointer shadow-lg"
+            className="p-1.5 bg-black/80 hover:bg-black text-white/80 hover:text-white rounded-md backdrop-blur-md border border-white/10 cursor-pointer shadow-lg btn-tactile"
           >
             <ArrowUp size={13} />
           </button>
           <button
             onClick={e => { e.stopPropagation(); moveItem(item.id, 'down'); }}
             title="Move later in list"
-            className="p-1.5 bg-black/80 hover:bg-black text-white/80 hover:text-white rounded-md backdrop-blur-md border border-white/10 cursor-pointer shadow-lg"
+            className="p-1.5 bg-black/80 hover:bg-black text-white/80 hover:text-white rounded-md backdrop-blur-md border border-white/10 cursor-pointer shadow-lg btn-tactile"
           >
             <ArrowDown size={13} />
           </button>
@@ -791,17 +860,24 @@ export default function AdminPage() {
             src={item.image}
             fallbackSrc={item.fallbackSrc}
             alt={item.title}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
           />
 
+          {/* Centered micro-interaction play button */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+            <div className="w-12 h-12 rounded-full bg-white/25 backdrop-blur-md border border-white/30 flex items-center justify-center text-white scale-75 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300 shadow-xl group-hover:rotate-6">
+              <Play size={18} fill="currentColor" className="ml-0.5" />
+            </div>
+          </div>
+
           {/* Overlay matching exact original layout */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-6 opacity-0 group-hover:opacity-100 transition-all duration-500">
-            <h3 className="text-white mb-2 text-xl font-bold translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent flex flex-col justify-end p-6 opacity-0 group-hover:opacity-100 transition-all duration-400">
+            <h3 className="text-white mb-2 text-xl font-bold translate-y-3 group-hover:translate-y-0 transition-transform duration-300">
               {item.title}
             </h3>
-            <div className="flex gap-2 flex-wrap translate-y-2 group-hover:translate-y-0 transition-transform duration-300 delay-75">
+            <div className="flex gap-2 flex-wrap translate-y-3 group-hover:translate-y-0 transition-transform duration-300 delay-75">
               {item.featured && (
-                <span className="px-2 py-0.5 bg-amber-500/20 backdrop-blur-md border border-amber-400/40 text-amber-300 text-[10px] font-bold uppercase tracking-widest">
+                <span className="px-2 py-0.5 bg-amber-500/25 backdrop-blur-md border border-amber-400/50 text-amber-300 text-[10px] font-bold uppercase tracking-widest shadow-sm">
                   ★ Featured
                 </span>
               )}
@@ -827,15 +903,15 @@ export default function AdminPage() {
       onClick={onClose}
     >
       <div
-        className={`relative w-full ${item.category === 'VERTICAL' ? 'max-w-[400px] aspect-[9/16]' : 'max-w-6xl aspect-video'} bg-black shadow-2xl ring-1 ring-white/10`}
+        className={`relative w-full ${item.category === 'VERTICAL' ? 'max-w-[400px] aspect-[9/16]' : 'max-w-6xl aspect-video'} bg-black shadow-2xl ring-1 ring-white/10 rounded-xl overflow-hidden scale-100 animate-in zoom-in-95 duration-200`}
         onClick={e => e.stopPropagation()}
       >
         <button
           onClick={onClose}
-          className="absolute -top-12 right-0 md:-right-14 md:top-0 text-white/70 hover:text-white transition-colors flex items-center justify-center bg-black/40 p-2 rounded-full backdrop-blur-md cursor-pointer"
+          className="absolute -top-12 right-0 md:-right-14 md:top-0 text-white/70 hover:text-white transition-all duration-300 hover:rotate-90 hover:scale-110 flex items-center justify-center bg-black/50 hover:bg-white hover:text-black p-2.5 rounded-full backdrop-blur-md cursor-pointer border border-white/20 shadow-xl"
           aria-label="Close"
         >
-          <X size={28} />
+          <X size={26} />
         </button>
         {isDirectVideo(item.videoLink) ? (
           <MuxVideoPlayer
@@ -867,12 +943,13 @@ export default function AdminPage() {
           <div className="max-w-7xl mx-auto px-6 lg:px-8 h-20 flex items-center justify-between">
             <button
               onClick={() => { setCurrentPage('home'); window.scrollTo({ top: 0, behavior: 'instant' }); }}
-              className="group flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-black hover:text-black/60 transition-colors cursor-pointer"
+              className="group flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-black hover:text-black/60 transition-all cursor-pointer btn-tactile"
             >
-              <span className="transition-transform duration-300 group-hover:-translate-x-1">←</span> Back to Portfolio
+              <ArrowLeft size={16} className="transition-transform duration-300 group-hover:-translate-x-1" />
+              <span>Back to Portfolio</span>
             </button>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-black text-white flex items-center justify-center font-bold text-xl">K</div>
+              <div className="w-10 h-10 bg-black text-white flex items-center justify-center font-bold text-xl shadow-md">K</div>
               <h1 className="text-sm font-bold tracking-widest uppercase hidden sm:block">Kshitij Rathore (Admin)</h1>
             </div>
           </div>
@@ -884,22 +961,30 @@ export default function AdminPage() {
               <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-400 mb-2">Creative Collection</p>
               <h2 className="text-4xl font-light tracking-tight text-black">CREATIVE ARCHIVE ({filteredWorkItems.length})</h2>
             </div>
-            <div className="flex gap-3 flex-wrap">
-              {['all', 'editor', 'colorist', 'motion', 'dop'].map((filter) => (
-                <button key={filter} onClick={() => toggleFilter(filter)}
-                  className={`px-5 py-2.5 border border-black rounded-full text-xs font-bold uppercase tracking-widest transition-all cursor-pointer ${activeFilters.includes(filter) ? 'bg-black text-white' : 'hover:bg-neutral-100'}`}
-                >
-                  {filter === 'all' ? 'All' : filter === 'dop' ? 'DOP' : filter.charAt(0).toUpperCase() + filter.slice(1)}
-                </button>
-              ))}
-            </div>
+            {loading ? (
+              <ShimmerFilters />
+            ) : (
+              <div className="flex gap-3 flex-wrap">
+                {['all', 'editor', 'colorist', 'motion', 'dop'].map((filter) => (
+                  <button key={filter} onClick={() => toggleFilter(filter)}
+                    className={`px-5 py-2.5 border border-black rounded-full text-xs font-bold uppercase tracking-widest transition-all cursor-pointer btn-tactile ${activeFilters.includes(filter) ? 'bg-black text-white shadow-md' : 'hover:bg-neutral-100'}`}
+                  >
+                    {filter === 'all' ? 'All' : filter === 'dop' ? 'DOP' : filter.charAt(0).toUpperCase() + filter.slice(1)}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0">
-            {filteredWorkItems.map((item) => (
-              <EditableProjectCard key={item.id} item={item} />
-            ))}
-          </div>
+          {loading ? (
+            <ShimmerGrid count={9} aspect="video" cols={3} />
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0">
+              {filteredWorkItems.map((item) => (
+                <EditableProjectCard key={item.id} item={item} />
+              ))}
+            </div>
+          )}
         </div>
         <Footer />
         {playingItem && <VideoModal item={playingItem} onClose={() => setPlayingItem(null)} />}
@@ -914,11 +999,12 @@ export default function AdminPage() {
         <nav className="fixed top-0 left-0 w-full z-50 bg-white/95 backdrop-blur-md border-b border-black/5">
           <div className="max-w-7xl mx-auto px-6 lg:px-8 h-20 flex items-center justify-between">
             <button onClick={() => { setCurrentPage('home'); window.scrollTo({ top: 0, behavior: 'instant' }); }}
-              className="group flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-black hover:text-black/60 transition-colors cursor-pointer">
-              <span className="transition-transform duration-300 group-hover:-translate-x-1">←</span> Back to Portfolio
+              className="group flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-black hover:text-black/60 transition-all cursor-pointer btn-tactile">
+              <ArrowLeft size={16} className="transition-transform duration-300 group-hover:-translate-x-1" />
+              <span>Back to Portfolio</span>
             </button>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-black text-white flex items-center justify-center font-bold text-xl">K</div>
+              <div className="w-10 h-10 bg-black text-white flex items-center justify-center font-bold text-xl shadow-md">K</div>
               <h1 className="text-sm font-bold tracking-widest uppercase hidden sm:block">Kshitij Rathore (Admin)</h1>
             </div>
           </div>
@@ -930,21 +1016,29 @@ export default function AdminPage() {
               <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-400 mb-2">Cinematic Shorts</p>
               <h2 className="text-4xl font-light tracking-tight text-black">VERTICAL ({filteredVerticalVideos.length})</h2>
             </div>
-            <div className="flex gap-3 flex-wrap">
-              {['all', 'editor', 'colorist', 'motion', 'dop'].map((filter) => (
-                <button key={filter} onClick={() => toggleFilter(filter)}
-                  className={`px-5 py-2.5 border border-black rounded-full text-xs font-bold uppercase tracking-widest transition-all cursor-pointer ${activeFilters.includes(filter) ? 'bg-black text-white' : 'hover:bg-neutral-100'}`}>
-                  {filter === 'all' ? 'All' : filter === 'dop' ? 'DOP' : filter.charAt(0).toUpperCase() + filter.slice(1)}
-                </button>
-              ))}
-            </div>
+            {loading ? (
+              <ShimmerFilters />
+            ) : (
+              <div className="flex gap-3 flex-wrap">
+                {['all', 'editor', 'colorist', 'motion', 'dop'].map((filter) => (
+                  <button key={filter} onClick={() => toggleFilter(filter)}
+                    className={`px-5 py-2.5 border border-black rounded-full text-xs font-bold uppercase tracking-widest transition-all cursor-pointer btn-tactile ${activeFilters.includes(filter) ? 'bg-black text-white shadow-md' : 'hover:bg-neutral-100'}`}>
+                    {filter === 'all' ? 'All' : filter === 'dop' ? 'DOP' : filter.charAt(0).toUpperCase() + filter.slice(1)}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-0">
-            {filteredVerticalVideos.map((item) => (
-              <EditableProjectCard key={item.id} item={item} isVertical />
-            ))}
-          </div>
+          {loading ? (
+            <ShimmerGrid count={10} aspect="vertical" cols={5} />
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-0">
+              {filteredVerticalVideos.map((item) => (
+                <EditableProjectCard key={item.id} item={item} isVertical />
+              ))}
+            </div>
+          )}
         </div>
         <Footer />
         {playingItem && <VideoModal item={playingItem} onClose={() => setPlayingItem(null)} />}
@@ -959,11 +1053,12 @@ export default function AdminPage() {
         <nav className="fixed top-0 left-0 w-full z-50 bg-white/95 backdrop-blur-md border-b border-black/5">
           <div className="max-w-7xl mx-auto px-6 lg:px-8 h-20 flex items-center justify-between">
             <button onClick={() => { setCurrentPage('home'); window.scrollTo({ top: 0, behavior: 'instant' }); }}
-              className="group flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-black hover:text-black/60 transition-colors cursor-pointer">
-              <span className="transition-transform duration-300 group-hover:-translate-x-1">←</span> Back to Portfolio
+              className="group flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-black hover:text-black/60 transition-all cursor-pointer btn-tactile">
+              <ArrowLeft size={16} className="transition-transform duration-300 group-hover:-translate-x-1" />
+              <span>Back to Portfolio</span>
             </button>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-black text-white flex items-center justify-center font-bold text-xl">K</div>
+              <div className="w-10 h-10 bg-black text-white flex items-center justify-center font-bold text-xl shadow-md">K</div>
               <h1 className="text-sm font-bold tracking-widest uppercase hidden sm:block">Kshitij Rathore (Admin)</h1>
             </div>
           </div>
@@ -972,24 +1067,33 @@ export default function AdminPage() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8 pt-32 pb-24">
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-16 gap-8 border-b border-black/5 pb-8">
             <div>
-              <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-400 mb-2">Cinematic Collection</p>
+              <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-400 mb-2">Director of Photography</p>
               <h2 className="text-4xl font-light tracking-tight text-black">CINEMATOGRAPHY ({filteredCinematographyWorks.length})</h2>
             </div>
-            <div className="flex gap-3 flex-wrap">
-              {['all', 'editor', 'colorist', 'motion', 'dop'].map((filter) => (
-                <button key={filter} onClick={() => toggleFilter(filter)}
-                  className={`px-5 py-2.5 border border-black rounded-full text-xs font-bold uppercase tracking-widest transition-all cursor-pointer ${activeFilters.includes(filter) ? 'bg-black text-white' : 'hover:bg-neutral-100'}`}>
-                  {filter === 'all' ? 'All' : filter === 'dop' ? 'DOP' : filter.charAt(0).toUpperCase() + filter.slice(1)}
-                </button>
-              ))}
-            </div>
+            {loading ? (
+              <ShimmerFilters />
+            ) : (
+              <div className="flex gap-3 flex-wrap">
+                {['all', 'editor', 'colorist', 'motion', 'dop'].map((filter) => (
+                  <button key={filter} onClick={() => toggleFilter(filter)}
+                    className={`px-5 py-2.5 border border-black rounded-full text-xs font-bold uppercase tracking-widest transition-all cursor-pointer btn-tactile ${activeFilters.includes(filter) ? 'bg-black text-white shadow-md' : 'hover:bg-neutral-100'}`}
+                  >
+                    {filter === 'all' ? 'All' : filter === 'dop' ? 'DOP' : filter.charAt(0).toUpperCase() + filter.slice(1)}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0">
-            {filteredCinematographyWorks.map((item) => (
-              <EditableProjectCard key={item.id} item={item} />
-            ))}
-          </div>
+          {loading ? (
+            <ShimmerGrid count={6} aspect="video" cols={3} />
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0">
+              {filteredCinematographyWorks.map((item) => (
+                <EditableProjectCard key={item.id} item={item} />
+              ))}
+            </div>
+          )}
         </div>
         <Footer />
         {playingItem && <VideoModal item={playingItem} onClose={() => setPlayingItem(null)} />}
@@ -997,58 +1101,75 @@ export default function AdminPage() {
     );
   }
 
+  // Main Home view
   return (
-    <div className="min-h-screen bg-white text-black font-sans selection:bg-black selection:text-white relative">
-      {/* Hidden tile uploader */}
+    <div className="min-h-screen bg-white text-black font-sans selection:bg-black selection:text-white">
+      {/* Hidden file input for tile uploads */}
       <input
-        ref={tileUploadRef}
+        ref={tileFileInputRef}
         type="file"
-        accept="image/*,video/mp4,video/webm"
+        accept="video/mp4,video/webm,image/*"
         onChange={handleTileFileChange}
         className="hidden"
       />
 
-      {/* Floating Admin Controls Header Strip */}
-      <div className="fixed top-0 left-0 w-full z-[80] bg-black/90 text-white border-b border-white/10 backdrop-blur-md px-6 py-2.5 flex items-center justify-between shadow-2xl">
+      {/* Floating Admin Controls Header Strip with Live Metric Chips */}
+      <div className="fixed top-0 left-0 w-full z-[80] bg-black/95 text-white border-b border-white/10 backdrop-blur-md px-6 py-2.5 flex items-center justify-between shadow-2xl">
         <div className="flex items-center gap-3">
-          <div className="w-6 h-6 bg-white text-black flex items-center justify-center font-black text-xs rounded">
+          <div className="w-6 h-6 bg-white text-black flex items-center justify-center font-black text-xs rounded shadow-sm">
             K
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold uppercase tracking-widest text-white">Visual Admin Mode</span>
-            <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[9px] font-bold border border-emerald-500/30 flex items-center gap-1">
+            <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[9px] font-bold border border-emerald-500/30 flex items-center gap-1.5 shadow-sm">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
               Live Editor
             </span>
           </div>
+
+          {/* Quick Metrics Badges */}
+          <div className="hidden lg:flex items-center gap-2 pl-4 border-l border-white/10 text-[11px] font-medium text-white/70">
+            <span className="px-2 py-0.5 bg-white/5 rounded-md border border-white/10">
+              <strong className="text-white">{data.length}</strong> Works
+            </span>
+            <span className="px-2 py-0.5 bg-white/5 rounded-md border border-white/10">
+              <strong className="text-white">{featuredWorks.length}</strong> Featured
+            </span>
+            <span className="px-2 py-0.5 bg-white/5 rounded-md border border-white/10">
+              <strong className="text-white">{horizontalWorks.length}</strong> Horizontal
+            </span>
+            <span className="px-2 py-0.5 bg-white/5 rounded-md border border-white/10">
+              <strong className="text-white">{verticalVideos.length}</strong> Vertical
+            </span>
+          </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <button
             onClick={() => {
               setEditModalItem(null);
               setIsModalOpen(true);
             }}
-            className="px-3.5 py-1.5 bg-white text-black hover:bg-neutral-200 rounded-full text-[11px] font-bold uppercase tracking-widest flex items-center gap-1.5 transition-all cursor-pointer shadow-md"
+            className="px-3.5 py-1.5 bg-white text-black hover:bg-neutral-200 rounded-full text-[11px] font-bold uppercase tracking-widest flex items-center gap-1.5 transition-all cursor-pointer shadow-md btn-tactile"
           >
             <Plus size={13} />
-            Add Project
+            <span>Add Project</span>
           </button>
 
           <a
             href="/"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-3 py-1.5 border border-white/20 hover:border-white/50 text-white rounded-full text-[11px] font-bold uppercase tracking-widest flex items-center gap-1.5 transition-all"
+            className="px-3 py-1.5 border border-white/20 hover:border-white/50 hover:bg-white/5 text-white rounded-full text-[11px] font-bold uppercase tracking-widest flex items-center gap-1.5 transition-all btn-tactile"
           >
             <Eye size={12} />
-            Live Site
+            <span className="hidden sm:inline">Live Site</span>
           </a>
 
           <button
             onClick={handleLogout}
             title="Log out"
-            className="p-1.5 border border-white/20 hover:bg-white/10 rounded-full text-white/70 hover:text-white transition-colors cursor-pointer"
+            className="p-1.5 border border-white/20 hover:border-white/50 hover:bg-white/10 rounded-full text-white/70 hover:text-white transition-all cursor-pointer btn-tactile"
           >
             <LogOut size={14} />
           </button>
@@ -1089,7 +1210,7 @@ export default function AdminPage() {
         </Navbar>
       </div>
 
-      {/* ─── Hero Section (Exact 100% Identical Replica of Frontend App.tsx) ── */}
+      {/* Hero Section */}
       <section id="home" className="relative min-h-screen px-6 lg:px-8 bg-black overflow-hidden flex items-center justify-center pt-28 pb-20">
         <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover pointer-events-none z-0">
           <source src="https://res.cloudinary.com/dvbarr6ni/video/upload/v1780090126/hero-bg_jxvbup.mp4" type="video/mp4" />
@@ -1173,18 +1294,7 @@ export default function AdminPage() {
         </div>
       </section>
 
-      {/* Loading indicator */}
-      {loading && (
-        <div className="flex items-center justify-center py-20">
-          <div className="flex gap-2">
-            <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-            <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-            <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-          </div>
-        </div>
-      )}
-
-      {/* ─── 01 Recent (Featured Works Carousel) ────────────────────────────── */}
+      {/* ─── 01 Recent (Featured Works Carousel) ─── */}
       <section id="works" className="py-20 bg-neutral-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between mb-12">
           <h2 className="text-2xl font-joyride font-normal tracking-wide text-black uppercase flex items-center gap-4">
@@ -1194,14 +1304,14 @@ export default function AdminPage() {
           <div className="flex gap-4">
             <button
               onClick={() => scrollRef.current?.scrollBy({ left: -500, behavior: 'smooth' })}
-              className="p-3 border border-black rounded-full hover:bg-black hover:text-white transition-all duration-300 flex items-center justify-center cursor-pointer"
+              className="p-3 border border-black rounded-full hover:bg-black hover:text-white hover:scale-110 active:scale-90 transition-all duration-300 flex items-center justify-center cursor-pointer shadow-sm hover:shadow-md"
               aria-label="Scroll left"
             >
               <ChevronLeft size={20} />
             </button>
             <button
               onClick={() => scrollRef.current?.scrollBy({ left: 500, behavior: 'smooth' })}
-              className="p-3 border border-black rounded-full hover:bg-black hover:text-white transition-all duration-300 flex items-center justify-center cursor-pointer"
+              className="p-3 border border-black rounded-full hover:bg-black hover:text-white hover:scale-110 active:scale-90 transition-all duration-300 flex items-center justify-center cursor-pointer shadow-sm hover:shadow-md"
               aria-label="Scroll right"
             >
               <ChevronRight size={20} />
@@ -1209,18 +1319,24 @@ export default function AdminPage() {
           </div>
         </div>
 
-        <div ref={scrollRef} className="overflow-x-auto no-scrollbar scroll-smooth">
-          <div className="flex gap-0 min-w-max">
-            {featuredWorks.map(item => (
-              <div key={item.id} className="w-[480px] flex-shrink-0">
-                <EditableProjectCard item={item} />
-              </div>
-            ))}
+        {loading ? (
+          <div className="max-w-7xl mx-auto px-6 lg:px-8">
+            <ShimmerCarousel count={4} />
           </div>
-        </div>
+        ) : (
+          <div ref={scrollRef} className="overflow-x-auto no-scrollbar scroll-smooth">
+            <div className="flex gap-0 min-w-max">
+              {featuredWorks.map(item => (
+                <div key={item.id} className="w-[340px] sm:w-[420px] md:w-[480px] flex-shrink-0">
+                  <EditableProjectCard item={item} />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </section>
 
-      {/* ─── 02 All Works (Grid with Filter & Drag) ─────────────────────────── */}
+      {/* ─── 02 All Works (Grid with Filter & Drag) ─── */}
       <section id="archive" className="py-20 px-6 lg:px-8 border-t border-black/5">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-8">
@@ -1228,22 +1344,28 @@ export default function AdminPage() {
               <span className="text-sm px-3.5 py-1 font-bold font-sans bg-black text-white rounded-full">02</span>
               All
             </h2>
-            <div className="flex gap-3 flex-wrap">
-              {['all', 'editor', 'colorist', 'motion', 'dop'].map(filter => (
-                <button
-                  key={filter}
-                  onClick={() => toggleFilter(filter)}
-                  className={`px-5 py-2.5 border border-black rounded-full text-xs font-bold uppercase tracking-widest transition-all cursor-pointer ${
-                    activeFilters.includes(filter) ? 'bg-black text-white' : 'hover:bg-neutral-100'
-                  }`}
-                >
-                  {filter === 'all' ? 'All' : filter === 'dop' ? 'DOP' : filter.charAt(0).toUpperCase() + filter.slice(1)}
-                </button>
-              ))}
-            </div>
+            {loading ? (
+              <ShimmerFilters />
+            ) : (
+              <div className="flex gap-3 flex-wrap">
+                {['all', 'editor', 'colorist', 'motion', 'dop'].map(filter => (
+                  <button
+                    key={filter}
+                    onClick={() => toggleFilter(filter)}
+                    className={`px-5 py-2.5 border border-black rounded-full text-xs font-bold uppercase tracking-widest transition-all cursor-pointer btn-tactile ${
+                      activeFilters.includes(filter) ? 'bg-black text-white shadow-md' : 'hover:bg-neutral-100'
+                    }`}
+                  >
+                    {filter === 'all' ? 'All' : filter === 'dop' ? 'DOP' : filter.charAt(0).toUpperCase() + filter.slice(1)}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
-          {filteredWorkItems.length > 0 ? (
+          {loading ? (
+            <ShimmerGrid count={6} aspect="video" cols={3} />
+          ) : filteredWorkItems.length > 0 ? (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0">
                 {filteredWorkItems.slice(0, colsCreative * 3).map(item => (
@@ -1254,7 +1376,7 @@ export default function AdminPage() {
                 <div className="flex justify-center mt-16">
                   <button
                     onClick={() => { setCurrentPage('creative-archive'); window.scrollTo({ top: 0, behavior: 'instant' }); }}
-                    className="px-12 py-5 border border-black text-[11px] font-bold uppercase tracking-[0.2em] text-black hover:bg-black hover:text-white transition-all duration-300 rounded-full cursor-pointer"
+                    className="px-12 py-5 border border-black text-[11px] font-bold uppercase tracking-[0.2em] text-black hover:bg-black hover:text-white transition-all duration-300 rounded-full cursor-pointer btn-tactile hover:shadow-lg"
                   >
                     See More
                   </button>
@@ -1262,14 +1384,14 @@ export default function AdminPage() {
               )}
             </>
           ) : (
-            <div className="py-20 text-center border border-dashed border-black/10">
+            <div className="py-20 text-center border border-dashed border-black/10 rounded-xl">
               <p className="text-black/40 uppercase tracking-[0.2em] text-xs font-bold">No horizontal works found for this selection.</p>
             </div>
           )}
         </div>
       </section>
 
-      {/* ─── 03 Vertical Works ──────────────────────────────────────────────── */}
+      {/* ─── 03 Vertical Works ─── */}
       <section id="verticals" className="py-20 px-6 lg:px-8 bg-neutral-50 border-t border-black/5">
         <div className="max-w-7xl mx-auto">
           <h2 className="mb-12 text-2xl font-joyride font-normal tracking-wide text-black uppercase flex items-center gap-4">
@@ -1277,7 +1399,9 @@ export default function AdminPage() {
             VERTICAL
           </h2>
 
-          {filteredVerticalVideos.length > 0 ? (
+          {loading ? (
+            <ShimmerGrid count={5} aspect="vertical" cols={5} />
+          ) : filteredVerticalVideos.length > 0 ? (
             <>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-0">
                 {filteredVerticalVideos.slice(0, colsPortrait * 2).map(item => (
@@ -1288,7 +1412,7 @@ export default function AdminPage() {
                 <div className="flex justify-center mt-16">
                   <button
                     onClick={() => { setCurrentPage('portrait-cinema'); window.scrollTo({ top: 0, behavior: 'instant' }); }}
-                    className="px-12 py-5 border border-black text-[11px] font-bold uppercase tracking-[0.2em] text-black hover:bg-black hover:text-white transition-all duration-300 rounded-full cursor-pointer"
+                    className="px-12 py-5 border border-black text-[11px] font-bold uppercase tracking-[0.2em] text-black hover:bg-black hover:text-white transition-all duration-300 rounded-full cursor-pointer btn-tactile hover:shadow-lg"
                   >
                     See More
                   </button>
@@ -1296,14 +1420,14 @@ export default function AdminPage() {
               )}
             </>
           ) : (
-            <div className="py-20 text-center border border-dashed border-black/10">
+            <div className="py-20 text-center border border-dashed border-black/10 rounded-xl">
               <p className="text-black/40 uppercase tracking-[0.2em] text-xs font-bold">No vertical works found.</p>
             </div>
           )}
         </div>
       </section>
 
-      {/* ─── 04 Cinematography Works ────────────────────────────────────────── */}
+      {/* ─── 04 Cinematography Works ─── */}
       <section id="cinematography" className="py-20 px-6 lg:px-8 bg-white border-t border-black/5">
         <div className="max-w-7xl mx-auto">
           <h2 className="mb-12 text-2xl font-joyride font-normal tracking-wide text-black uppercase flex items-center gap-4">
@@ -1311,7 +1435,9 @@ export default function AdminPage() {
             CINEMATOGRAPHY
           </h2>
 
-          {cinematographyWorks.length > 0 ? (
+          {loading ? (
+            <ShimmerGrid count={3} aspect="video" cols={3} />
+          ) : cinematographyWorks.length > 0 ? (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0">
                 {cinematographyWorks.slice(0, colsCreative * 3).map(item => (
@@ -1322,7 +1448,7 @@ export default function AdminPage() {
                 <div className="flex justify-center mt-16">
                   <button
                     onClick={() => { setCurrentPage('cinematography'); window.scrollTo({ top: 0, behavior: 'instant' }); }}
-                    className="px-12 py-5 border border-black text-[11px] font-bold uppercase tracking-[0.2em] text-black hover:bg-black hover:text-white transition-all duration-300 rounded-full cursor-pointer"
+                    className="px-12 py-5 border border-black text-[11px] font-bold uppercase tracking-[0.2em] text-black hover:bg-black hover:text-white transition-all duration-300 rounded-full cursor-pointer btn-tactile hover:shadow-lg"
                   >
                     See More
                   </button>
@@ -1330,7 +1456,7 @@ export default function AdminPage() {
               )}
             </>
           ) : (
-            <div className="py-20 text-center border border-dashed border-black/10">
+            <div className="py-20 text-center border border-dashed border-black/10 rounded-xl">
               <p className="text-black/40 uppercase tracking-[0.2em] text-xs font-bold">No cinematography works found.</p>
             </div>
           )}
@@ -1349,14 +1475,45 @@ export default function AdminPage() {
                 <span className="text-sm px-3.5 py-1 font-bold font-sans bg-black text-white rounded-full">05</span>
                 ABOUT
               </h2>
-              <p className="text-4xl md:text-5xl font-light tracking-tight leading-[1.1] text-black">
-                Mumbai-based creative with a sharp eye for storytelling through <span className="italic">motion</span> and <span className="italic font-medium bg-gradient-to-r from-blue-600 via-purple-500 to-orange-500 bg-clip-text text-transparent">color</span>.
-              </p>
+              <div className="space-y-8 text-neutral-800 text-lg md:text-xl font-light leading-relaxed">
+                <p>
+                  I'm Kshitij Rathore, a visual artist, filmmaker, and post-production specialist with over 7 years of experience crafting high-impact commercials, music videos, and cinematic promos.
+                </p>
+                <p>
+                  My work lives at the intersection of raw emotion and surgical precision. From high-energy brand campaigns to moody narrative pieces, I approach every frame with obsessive attention to color, pacing, and visual story.
+                </p>
+                <p>
+                  Over the years, I've had the privilege of collaborating with top brands including Netflix, Amazon Prime Video, Disney+ Hotstar, Swiggy, and CRED, working alongside legendary talents and cutting-edge creators across India.
+                </p>
+              </div>
+
+              <div className="pt-8 border-t border-black/10 grid grid-cols-2 sm:grid-cols-3 gap-8">
+                <div>
+                  <h4 className="text-3xl font-light tracking-tight text-black mb-1">7+</h4>
+                  <p className="text-xs uppercase tracking-widest text-neutral-500 font-bold">Years Experience</p>
+                </div>
+                <div>
+                  <h4 className="text-3xl font-light tracking-tight text-black mb-1">100+</h4>
+                  <p className="text-xs uppercase tracking-widest text-neutral-500 font-bold">Projects Delivered</p>
+                </div>
+                <div>
+                  <h4 className="text-3xl font-light tracking-tight text-black mb-1">50M+</h4>
+                  <p className="text-xs uppercase tracking-widest text-neutral-500 font-bold">Views Generated</p>
+                </div>
+              </div>
             </div>
-            <div className="flex flex-col justify-end space-y-10">
-              <p className="text-xl text-black/70 leading-relaxed max-w-xl">
-                Spending most of my time turning ideas into moving images, shooting them, editing them, grading them, and occasionally losing sleep over tiny creative decisions. Worth it every time.
-              </p>
+
+            <div className="relative">
+              <div className="aspect-[4/5] bg-neutral-100 overflow-hidden rounded-2xl relative shadow-2xl">
+                <ImageWithFallback
+                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1000&auto=format&fit=crop"
+                  alt="Kshitij Rathore Portrait"
+                  className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-8">
+                  <p className="text-white text-xs uppercase tracking-[0.25em] font-bold">Mumbai &bull; Available Worldwide</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1364,18 +1521,21 @@ export default function AdminPage() {
 
       <Footer />
 
-      {/* Video Lightbox Modal */}
+      {/* Video Modal Player */}
       {playingItem && <VideoModal item={playingItem} onClose={() => setPlayingItem(null)} />}
 
-      {/* Edit / Create Modal */}
+      {/* Edit / Create Work Modal */}
       <WorkModal
-        isOpen={isModalOpen}
         work={editModalItem}
-        onClose={() => setIsModalOpen(false)}
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setEditModalItem(null);
+        }}
         onSave={handleSaveWork}
       />
 
-      {/* Toast */}
+      {/* Toast popup */}
       {toast && (
         <Toast
           message={toast.message}
