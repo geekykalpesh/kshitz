@@ -10,6 +10,8 @@ const router = Router();
 router.get('/', async (_req, res: Response) => {
   try {
     const allWorks = await db.select().from(works).orderBy(asc(works.displayOrder), asc(works.id));
+    // High-performance edge caching: browser caches for 60s, Vercel/CDN caches for 1hr, serves stale while revalidating for 24hr
+    res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=3600, stale-while-revalidate=86400');
     res.json(allWorks);
   } catch (error) {
     console.error('Error fetching works:', error);

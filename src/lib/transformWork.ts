@@ -1,4 +1,4 @@
-import { WorkItem as ApiWorkItem } from './api';
+import { WorkItem as ApiWorkItem, getCachedWorks } from './api';
 
 export interface DisplayWorkItem {
   id: number;
@@ -70,4 +70,14 @@ export function transformWork(item: ApiWorkItem): DisplayWorkItem {
     displayOrder: item.displayOrder ?? item.id,
     rawItem: item,
   };
+}
+
+export function getInitialDisplayWorks(): DisplayWorkItem[] {
+  try {
+    const cached = getCachedWorks();
+    return cached.filter(w => w && w.title).map(transformWork);
+  } catch (e) {
+    console.warn('Error loading initial display works:', e);
+    return [];
+  }
 }

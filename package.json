@@ -10,8 +10,10 @@
   "dependencies": {
     "@emotion/react": "11.14.0",
     "@emotion/styled": "11.14.1",
+    "@imagekit/react": "^5.0.3",
     "@mui/icons-material": "7.3.5",
     "@mui/material": "7.3.5",
+    "@mux/mux-player-react": "^3.14.1",
     "@neon/config": "^1.9.3",
     "@neon/env": "^1.6.4",
     "@popperjs/core": "2.11.8",
@@ -59,6 +61,7 @@
     "react-resizable-panels": "2.1.7",
     "react-responsive-masonry": "2.7.1",
     "react-router": "7.13.0",
+    "react-router-dom": "^7.18.4",
     "react-slick": "0.31.0",
     "recharts": "2.15.2",
     "sonner": "2.0.3",

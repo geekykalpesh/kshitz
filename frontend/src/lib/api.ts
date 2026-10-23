@@ -1,3 +1,5 @@
+import { initialWorks } from '../data/initialWorks';
+
 const rawUrl = import.meta.env.VITE_API_URL;
 const API_BASE = rawUrl ? `${rawUrl.replace(/\/$/, '')}/api` : '/api';
 
@@ -24,6 +26,33 @@ export interface NewWorkItem {
   displayOrder?: number;
 }
 
+const CACHE_KEY = 'kshitiz_works_cache_v2';
+
+export function getCachedWorks(): WorkItem[] {
+  try {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
+    }
+  } catch (e) {
+    console.warn('Could not read cached works from localStorage', e);
+  }
+  return initialWorks;
+}
+
+export function saveCachedWorks(works: WorkItem[]): void {
+  try {
+    if (Array.isArray(works) && works.length > 0) {
+      localStorage.setItem(CACHE_KEY, JSON.stringify(works));
+    }
+  } catch (e) {
+    console.warn('Could not save cached works to localStorage', e);
+  }
+}
+
 // Get auth token from localStorage
 function getToken(): string | null {
   return localStorage.getItem('admin_token');
@@ -34,11 +63,29 @@ function authHeaders() {
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
-// Fetch all works (public)
-export async function fetchWorks(): Promise<WorkItem[]> {
-  const response = await fetch(`${API_BASE}/works`);
-  if (!response.ok) throw new Error('Failed to fetch works');
-  return response.json();
+// Fetch all works (public) with stale-while-revalidate and timeout fallback
+export async function fetchWorks(forceFresh = false): Promise<WorkItem[]> {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 12000);
+
+    const response = await fetch(`${API_BASE}/works`, {
+      signal: controller.signal,
+      cache: forceFresh ? 'reload' : 'default',
+    });
+    clearTimeout(timeoutId);
+
+    if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+    const data: WorkItem[] = await response.json();
+    if (Array.isArray(data) && data.length > 0) {
+      saveCachedWorks(data);
+      return data;
+    }
+    return getCachedWorks();
+  } catch (error) {
+    console.warn('Network fetch error or timeout, returning cached works:', error);
+    return getCachedWorks();
+  }
 }
 
 // Admin: Login
@@ -85,7 +132,12 @@ export async function createWork(work: NewWorkItem): Promise<WorkItem> {
     throw new Error(err.error || 'Failed to create work');
   }
   
-  return response.json();
+  const created: WorkItem = await response.json();
+  try {
+    const current = getCachedWorks();
+    saveCachedWorks([created, ...current]);
+  } catch {}
+  return created;
 }
 
 // Admin: Update work
@@ -101,7 +153,12 @@ export async function updateWork(id: number, work: Partial<NewWorkItem>): Promis
     throw new Error(err.error || 'Failed to update work');
   }
   
-  return response.json();
+  const updated: WorkItem = await response.json();
+  try {
+    const current = getCachedWorks();
+    saveCachedWorks(current.map(w => w.id === id ? updated : w));
+  } catch {}
+  return updated;
 }
 
 // Admin: Delete work
@@ -115,6 +172,11 @@ export async function deleteWork(id: number): Promise<void> {
     const err = await response.json();
     throw new Error(err.error || 'Failed to delete work');
   }
+
+  try {
+    const current = getCachedWorks();
+    saveCachedWorks(current.filter(w => w.id !== id));
+  } catch {}
 }
 
 // Admin: Update thumbnail only
@@ -130,7 +192,12 @@ export async function updateThumbnail(id: number, imageThumbnailLink: string): P
     throw new Error(err.error || 'Failed to update thumbnail');
   }
   
-  return response.json();
+  const updated: WorkItem = await response.json();
+  try {
+    const current = getCachedWorks();
+    saveCachedWorks(current.map(w => w.id === id ? updated : w));
+  } catch {}
+  return updated;
 }
 
 // Admin: Upload media file (video or image)
@@ -167,6 +234,14 @@ export async function reorderWorks(items: { id: number; displayOrder: number }[]
     const err = await response.json();
     throw new Error(err.error || 'Failed to reorder works');
   }
+
+  try {
+    const current = getCachedWorks();
+    const orderMap = new Map(items.map(it => [it.id, it.displayOrder]));
+    const reordered = current.map(w => orderMap.has(w.id) ? { ...w, displayOrder: orderMap.get(w.id)! } : w);
+    reordered.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
+    saveCachedWorks(reordered);
+  } catch {}
 }
 
 export function adminLogout() {

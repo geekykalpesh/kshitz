@@ -1,5 +1,5 @@
 import React from 'react';
-import { Film, Play } from 'lucide-react';
+import { Film } from 'lucide-react';
 
 interface ShimmerCardProps {
   aspect?: 'video' | 'vertical';
@@ -7,41 +7,35 @@ interface ShimmerCardProps {
   dark?: boolean;
 }
 
-export function ShimmerCard({ aspect = 'video', className = '', dark = false }: ShimmerCardProps) {
+export function ShimmerCard({ aspect = 'video', className = '', dark = true }: ShimmerCardProps) {
   const isVertical = aspect === 'vertical';
 
   return (
     <div
       className={`relative overflow-hidden ${
         isVertical ? 'aspect-[9/16]' : 'aspect-video'
-      } ${
-        dark ? 'bg-[#18181b]' : 'bg-neutral-200'
-      } animate-shimmer ${dark ? 'animate-shimmer-dark' : ''} ${className}`}
+      } bg-[#0c0c0f] border border-white/[0.07] animate-shimmer ${className}`}
     >
-      {/* Subtle background glow */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black/5 via-transparent to-black/10 pointer-events-none" />
+      {/* Luxury subtle ambient radial glow */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(255,255,255,0.03),transparent_70%)] pointer-events-none" />
 
-      {/* Center placeholder circle with play hint */}
+      {/* Center minimalist frosted lens emblem */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div
-          className={`w-12 h-12 rounded-full border ${
-            dark ? 'border-white/10 bg-white/5' : 'border-black/10 bg-white/40'
-          } backdrop-blur-sm flex items-center justify-center shadow-sm opacity-50`}
-        >
-          <Play size={18} className={dark ? 'text-white/30 ml-0.5' : 'text-black/30 ml-0.5'} />
+        <div className="w-12 h-12 rounded-full border border-white/[0.08] bg-white/[0.03] backdrop-blur-md flex items-center justify-center shadow-2xl">
+          <Film size={18} className="text-white/35 ml-0.5 animate-pulse" />
         </div>
       </div>
 
-      {/* Bottom overlay skeleton info */}
-      <div className="absolute inset-x-0 bottom-0 p-5 bg-gradient-to-t from-black/60 via-black/20 to-transparent flex flex-col justify-end gap-2.5 pointer-events-none">
-        {/* Title bar placeholder */}
-        <div className="h-4 w-4/5 rounded bg-white/30 backdrop-blur-sm animate-pulse" />
+      {/* Bottom overlay skeleton info with glassmorphism */}
+      <div className="absolute inset-x-0 bottom-0 p-5 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end gap-2.5 pointer-events-none">
+        {/* Title bar placeholder with sleek gradient */}
+        <div className="h-3.5 w-3/5 rounded bg-white/[0.14] backdrop-blur-sm" />
         {/* Secondary subtitle line */}
-        <div className="h-3 w-1/2 rounded bg-white/20 backdrop-blur-sm animate-pulse" />
+        <div className="h-2.5 w-1/3 rounded bg-white/[0.07] backdrop-blur-sm" />
         {/* Tag pills skeleton */}
-        <div className="flex gap-1.5 pt-1">
-          <div className="h-3.5 w-14 rounded-full bg-white/25 backdrop-blur-sm" />
-          <div className="h-3.5 w-16 rounded-full bg-white/20 backdrop-blur-sm" />
+        <div className="flex gap-2 pt-1 items-center">
+          <div className="h-4 w-14 rounded-full bg-white/[0.06] border border-white/[0.08]" />
+          <div className="h-4 w-16 rounded-full bg-white/[0.04] border border-white/[0.06]" />
         </div>
       </div>
     </div>
@@ -86,13 +80,13 @@ export function ShimmerGrid({
 }
 
 export function ShimmerFilters() {
-  const widths = ['w-14', 'w-20', 'w-24', 'w-20', 'w-16'];
+  const widths = ['w-16', 'w-24', 'w-28', 'w-20', 'w-24'];
   return (
-    <div className="flex gap-3 flex-wrap">
+    <div className="flex gap-2.5 flex-wrap">
       {widths.map((w, idx) => (
         <div
           key={idx}
-          className={`h-9 ${w} rounded-full bg-neutral-200 animate-shimmer border border-black/10`}
+          className={`h-9 ${w} rounded-full bg-[#121217] border border-white/[0.08] animate-shimmer`}
         />
       ))}
     </div>
@@ -105,10 +99,10 @@ export function ShimmerAdminStats() {
       {[1, 2, 3, 4].map(i => (
         <div
           key={i}
-          className="p-4 rounded-xl bg-neutral-900 border border-white/10 animate-shimmer animate-shimmer-dark space-y-2"
+          className="p-5 rounded-2xl bg-[#0f0f13] border border-white/[0.08] animate-shimmer space-y-2.5 shadow-xl"
         >
-          <div className="h-3 w-20 rounded bg-white/20" />
-          <div className="h-7 w-12 rounded bg-white/40" />
+          <div className="h-3 w-20 rounded bg-white/[0.12]" />
+          <div className="h-7 w-14 rounded bg-white/[0.25]" />
         </div>
       ))}
     </div>

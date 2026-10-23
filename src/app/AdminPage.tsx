@@ -32,7 +32,7 @@ import {
   verifyToken,
   adminLogout
 } from '@/lib/api';
-import { transformWork, DisplayWorkItem } from '@/lib/transformWork';
+import { transformWork, DisplayWorkItem, getInitialDisplayWorks } from '@/lib/transformWork';
 import { ShimmerCarousel, ShimmerGrid, ShimmerFilters } from './components/Shimmer';
 
 function Footer() {
@@ -381,8 +381,8 @@ export default function AdminPage() {
   const [loginLoading, setLoginLoading] = useState(false);
 
   // Portfolio items & UI state
-  const [data, setData] = useState<DisplayWorkItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<DisplayWorkItem[]>(() => getInitialDisplayWorks());
+  const [loading, setLoading] = useState(() => getInitialDisplayWorks().length === 0);
   const [activeFilters, setActiveFilters] = useState<string[]>(['all']);
   const [playingItem, setPlayingItem] = useState<DisplayWorkItem | null>(null);
 
@@ -423,7 +423,7 @@ export default function AdminPage() {
 
   const loadWorks = async () => {
     try {
-      setLoading(true);
+      if (data.length === 0) setLoading(true);
       const works = await fetchWorks();
       const transformed = works.filter(w => w.title).map(transformWork);
       setData(transformed);
@@ -1506,9 +1506,9 @@ export default function AdminPage() {
             <div className="relative">
               <div className="aspect-[4/5] bg-neutral-100 overflow-hidden rounded-2xl relative shadow-2xl">
                 <ImageWithFallback
-                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1000&auto=format&fit=crop"
+                  src="/kshitiz-portrait.jpg"
                   alt="Kshitij Rathore Portrait"
-                  className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
+                  className="w-full h-full object-cover object-[center_15%] grayscale hover:grayscale-0 transition-all duration-700"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-8">
                   <p className="text-white text-xs uppercase tracking-[0.25em] font-bold">Mumbai &bull; Available Worldwide</p>
