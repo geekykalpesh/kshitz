@@ -1,4 +1,5 @@
-const API_BASE = '/api';
+const rawUrl = import.meta.env.VITE_API_URL;
+const API_BASE = rawUrl ? `${rawUrl.replace(/\/$/, '')}/api` : '/api';
 
 export interface WorkItem {
   id: number;

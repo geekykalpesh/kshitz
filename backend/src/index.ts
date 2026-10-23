@@ -45,6 +45,19 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Routes
+app.get('/', (_req, res) => {
+  res.json({
+    message: 'Kshitz Portfolio API is running',
+    status: 'online',
+    version: '1.0.0',
+    endpoints: {
+      health: '/api/health',
+      works: '/api/works',
+      neonStatus: '/api/neon-status',
+    },
+  });
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/works', worksRoutes);
 
