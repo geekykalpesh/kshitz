@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, lazy, Suspense } from 'react';
 import {
   ChevronLeft, ChevronRight, X, Film, Edit3, Trash2, Plus, Upload,
   GripVertical, Star, StarOff, Save, Check, ArrowUp, ArrowDown, LogOut,
@@ -18,7 +18,11 @@ import {
   MobileNavMenu,
 } from "@/components/ui/resizable-navbar";
 import { motion, AnimatePresence } from 'motion/react';
-import { MuxVideoPlayer } from '@/components/MuxVideoPlayer';
+
+// Lazy load Mux player only when previewing video modal
+const MuxVideoPlayer = lazy(() =>
+  import('@/components/MuxVideoPlayer').then(m => ({ default: m.MuxVideoPlayer }))
+);
 import {
   WorkItem,
   NewWorkItem,
@@ -774,7 +778,7 @@ export default function AdminPage() {
         onDragStart={e => handleDragStart(e, item.id)}
         onDragOver={e => handleDragOver(e, item.id)}
         onDrop={e => handleDrop(e, item.id)}
-        className={`group relative overflow-hidden bg-neutral-200 transition-all duration-300 select-none cursor-grab active:cursor-grabbing border ${
+        className={`group relative overflow-hidden bg-[#0c0c0f] transition-all duration-300 select-none cursor-grab active:cursor-grabbing border ${
           isOver ? 'border-amber-400 ring-4 ring-amber-400/50 scale-[0.98]' : 'border-transparent'
         } ${isDragged ? 'opacity-30 scale-95' : 'opacity-100 hover:scale-[1.01] hover:z-20'}`}
       >
@@ -854,7 +858,7 @@ export default function AdminPage() {
         {/* Media Preview container matching exact public site */}
         <div
           onClick={() => setPlayingItem(item)}
-          className={`relative ${isVertical ? 'aspect-[9/16]' : 'aspect-video'} overflow-hidden bg-neutral-200 cursor-pointer`}
+          className={`relative ${isVertical ? 'aspect-[9/16]' : 'aspect-video'} overflow-hidden bg-[#0c0c0f] cursor-pointer`}
         >
           <ImageWithFallback
             src={item.image}
@@ -914,15 +918,24 @@ export default function AdminPage() {
           <X size={26} />
         </button>
         {isDirectVideo(item.videoLink) ? (
-          <MuxVideoPlayer
-            src={item.videoLink}
-            poster={item.image}
-            title={item.title}
-            videoId={item.id}
-            className="w-full h-full object-contain"
-            autoPlay
-            controls
-          />
+          <Suspense
+            fallback={
+              <div className="w-full h-full flex flex-col items-center justify-center bg-[#070709] gap-3">
+                <div className="w-10 h-10 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+                <p className="text-[10px] uppercase font-mono tracking-widest text-white/40">Loading Player</p>
+              </div>
+            }
+          >
+            <MuxVideoPlayer
+              src={item.videoLink}
+              poster={item.image}
+              title={item.title}
+              videoId={item.id}
+              className="w-full h-full object-contain"
+              autoPlay
+              controls
+            />
+          </Suspense>
         ) : (
           <iframe
             src={getEmbedUrl(item.videoLink)}

@@ -29,11 +29,12 @@ export function transformWork(item: ApiWorkItem): DisplayWorkItem {
     }
   }
 
-  // Build fallback list
+  // Build fallback list with fast-loading high-quality defaults
   const fallbacks: string[] = [];
   if (youtubeId) {
-    fallbacks.push(`https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`);
     fallbacks.push(`https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`);
+    fallbacks.push(`https://img.youtube.com/vi/${youtubeId}/mqdefault.jpg`);
+    fallbacks.push(`https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`);
   } else if (videoLink.includes('instagram.com')) {
     fallbacks.push('https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1080');
   } else if (videoLink.includes('drive.google.com')) {

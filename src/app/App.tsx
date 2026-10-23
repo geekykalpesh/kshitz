@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, lazy, Suspense } from 'react';
 import { ChevronLeft, ChevronRight, X, Film, Play, ArrowLeft } from 'lucide-react';
 import { ImageWithFallback } from './components/figma/ImageWithFallback';
 import { Marquee } from './components/Marquee';
@@ -16,8 +16,12 @@ import {
 import { motion } from 'motion/react';
 import { fetchWorks } from '@/lib/api';
 import { transformWork, DisplayWorkItem, getInitialDisplayWorks } from '@/lib/transformWork';
-import { MuxVideoPlayer } from '@/components/MuxVideoPlayer';
 import { ShimmerCarousel, ShimmerGrid, ShimmerFilters } from './components/Shimmer';
+
+// Lazy load heavy Mux player only when video modal is opened
+const MuxVideoPlayer = lazy(() =>
+  import('@/components/MuxVideoPlayer').then(m => ({ default: m.MuxVideoPlayer }))
+);
 
 function Footer() {
   return (
@@ -136,6 +140,9 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState<'home' | 'creative-archive' | 'portrait-cinema' | 'cinematography'>('home');
   const [colsCreative, setColsCreative] = useState(3);
   const [colsPortrait, setColsPortrait] = useState(5);
+  const [visibleCreative, setVisibleCreative] = useState(18);
+  const [visibleVerticals, setVisibleVerticals] = useState(20);
+  const [visibleCinematography, setVisibleCinematography] = useState(18);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -235,15 +242,24 @@ export default function App() {
           <X size={26} />
         </button>
         {isDirectVideo(item.videoLink) ? (
-          <MuxVideoPlayer
-            src={getDirectVideoUrl(item.videoLink)}
-            poster={item.image}
-            title={item.title}
-            videoId={item.id}
-            className="w-full h-full object-contain"
-            autoPlay
-            controls
-          />
+          <Suspense
+            fallback={
+              <div className="w-full h-full flex flex-col items-center justify-center bg-[#070709] gap-3">
+                <div className="w-10 h-10 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+                <p className="text-[10px] uppercase font-mono tracking-widest text-white/40">Loading Player</p>
+              </div>
+            }
+          >
+            <MuxVideoPlayer
+              src={getDirectVideoUrl(item.videoLink)}
+              poster={item.image}
+              title={item.title}
+              videoId={item.id}
+              className="w-full h-full object-contain"
+              autoPlay
+              controls
+            />
+          </Suspense>
         ) : (
           <iframe
             src={getEmbedUrl(item.videoLink)}
@@ -300,30 +316,42 @@ export default function App() {
           {loading ? (
             <ShimmerGrid count={9} aspect="video" cols={3} />
           ) : filteredWorkItems.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0">
-              {filteredWorkItems.map((item) => (
-                <div key={item.id} className="group cursor-pointer relative overflow-hidden" onClick={() => setPlayingItem(item)}>
-                  <div className="relative aspect-video overflow-hidden bg-neutral-200">
-                    <ImageWithFallback src={item.image} fallbackSrc={item.fallbackSrc} alt={item.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
-                    {/* Centered micro-interaction play button on hover */}
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
-                      <div className="w-12 h-12 rounded-full bg-white/25 backdrop-blur-md border border-white/30 flex items-center justify-center text-white scale-75 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300 shadow-xl group-hover:rotate-6">
-                        <Play size={18} fill="currentColor" className="ml-0.5" />
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0">
+                {filteredWorkItems.slice(0, visibleCreative).map((item) => (
+                  <div key={item.id} className="group cursor-pointer relative overflow-hidden" onClick={() => setPlayingItem(item)}>
+                    <div className="relative aspect-video overflow-hidden bg-[#0c0c0f]">
+                      <ImageWithFallback src={item.image} fallbackSrc={item.fallbackSrc} alt={item.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
+                      {/* Centered micro-interaction play button on hover */}
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+                        <div className="w-12 h-12 rounded-full bg-white/25 backdrop-blur-md border border-white/30 flex items-center justify-center text-white scale-75 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300 shadow-xl group-hover:rotate-6">
+                          <Play size={18} fill="currentColor" className="ml-0.5" />
+                        </div>
                       </div>
-                    </div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent flex flex-col justify-end p-6 opacity-0 group-hover:opacity-100 transition-all duration-400">
-                      <h3 className="text-white mb-2 text-xl font-bold translate-y-3 group-hover:translate-y-0 transition-transform duration-300">{item.title}</h3>
-                      <div className="flex gap-2 flex-wrap translate-y-3 group-hover:translate-y-0 transition-transform duration-300 delay-75">
-                        {item.tags.map((tag) => (
-                          <span key={tag} className="px-2 py-0.5 bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold uppercase tracking-widest">{tag}</span>
-                        ))}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent flex flex-col justify-end p-6 opacity-0 group-hover:opacity-100 transition-all duration-400">
+                        <h3 className="text-white mb-2 text-xl font-bold translate-y-3 group-hover:translate-y-0 transition-transform duration-300">{item.title}</h3>
+                        <div className="flex gap-2 flex-wrap translate-y-3 group-hover:translate-y-0 transition-transform duration-300 delay-75">
+                          {item.tags.map((tag) => (
+                            <span key={tag} className="px-2 py-0.5 bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold uppercase tracking-widest">{tag}</span>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
+                ))}
+              </div>
+              {filteredWorkItems.length > visibleCreative && (
+                <div className="flex justify-center mt-16">
+                  <button
+                    onClick={() => setVisibleCreative(prev => prev + 18)}
+                    className="px-8 py-3.5 bg-black text-white rounded-full text-xs font-bold uppercase tracking-widest hover:bg-neutral-800 transition-all cursor-pointer btn-tactile shadow-lg"
+                  >
+                    Load More Projects ({filteredWorkItems.length - visibleCreative} remaining)
+                  </button>
                 </div>
-              ))}
-            </div>
+              )}
+            </>
           ) : (
             <div className="py-20 text-center border border-dashed border-black/10 rounded-xl">
               <p className="text-black/40 uppercase tracking-[0.2em] text-xs font-bold">No horizontal works found.</p>
@@ -377,29 +405,41 @@ export default function App() {
           {loading ? (
             <ShimmerGrid count={10} aspect="vertical" cols={5} />
           ) : filteredVerticalVideos.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-0">
-              {filteredVerticalVideos.map((item) => (
-                <div key={item.id} className="group cursor-pointer w-full relative overflow-hidden" onClick={() => setPlayingItem(item)}>
-                  <div className="relative aspect-[9/16] overflow-hidden bg-neutral-200">
-                    <ImageWithFallback src={item.image} fallbackSrc={item.fallbackSrc} alt={item.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
-                      <div className="w-12 h-12 rounded-full bg-white/25 backdrop-blur-md border border-white/30 flex items-center justify-center text-white scale-75 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300 shadow-xl group-hover:rotate-6">
-                        <Play size={18} fill="currentColor" className="ml-0.5" />
+            <>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-0">
+                {filteredVerticalVideos.slice(0, visibleVerticals).map((item) => (
+                  <div key={item.id} className="group cursor-pointer w-full relative overflow-hidden" onClick={() => setPlayingItem(item)}>
+                    <div className="relative aspect-[9/16] overflow-hidden bg-[#0c0c0f]">
+                      <ImageWithFallback src={item.image} fallbackSrc={item.fallbackSrc} alt={item.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+                        <div className="w-12 h-12 rounded-full bg-white/25 backdrop-blur-md border border-white/30 flex items-center justify-center text-white scale-75 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300 shadow-xl group-hover:rotate-6">
+                          <Play size={18} fill="currentColor" className="ml-0.5" />
+                        </div>
                       </div>
-                    </div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent flex flex-col justify-end p-6 opacity-0 group-hover:opacity-100 transition-all duration-400">
-                      <h3 className="text-white text-lg font-bold translate-y-3 group-hover:translate-y-0 transition-transform duration-300">{item.title}</h3>
-                      <div className="flex gap-2 flex-wrap mt-2 translate-y-3 group-hover:translate-y-0 transition-transform duration-300 delay-75">
-                        {item.tags.map((tag) => (
-                          <span key={tag} className="px-2 py-0.5 bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold uppercase tracking-widest">{tag}</span>
-                        ))}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent flex flex-col justify-end p-6 opacity-0 group-hover:opacity-100 transition-all duration-400">
+                        <h3 className="text-white text-lg font-bold translate-y-3 group-hover:translate-y-0 transition-transform duration-300">{item.title}</h3>
+                        <div className="flex gap-2 flex-wrap mt-2 translate-y-3 group-hover:translate-y-0 transition-transform duration-300 delay-75">
+                          {item.tags.map((tag) => (
+                            <span key={tag} className="px-2 py-0.5 bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold uppercase tracking-widest">{tag}</span>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
+                ))}
+              </div>
+              {filteredVerticalVideos.length > visibleVerticals && (
+                <div className="flex justify-center mt-16">
+                  <button
+                    onClick={() => setVisibleVerticals(prev => prev + 20)}
+                    className="px-8 py-3.5 bg-black text-white rounded-full text-xs font-bold uppercase tracking-widest hover:bg-neutral-800 transition-all cursor-pointer btn-tactile shadow-lg"
+                  >
+                    Load More Verticals ({filteredVerticalVideos.length - visibleVerticals} remaining)
+                  </button>
                 </div>
-              ))}
-            </div>
+              )}
+            </>
           ) : (
             <div className="py-20 text-center border border-dashed border-black/10 rounded-xl">
               <p className="text-black/40 uppercase tracking-[0.2em] text-xs font-bold">No vertical works found.</p>
@@ -454,29 +494,41 @@ export default function App() {
           {loading ? (
             <ShimmerGrid count={6} aspect="video" cols={3} />
           ) : filteredCinematographyWorks.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0">
-              {filteredCinematographyWorks.map((item) => (
-                <div key={item.id} className="group cursor-pointer relative overflow-hidden" onClick={() => setPlayingItem(item)}>
-                  <div className={`relative ${item.category === 'VERTICAL' ? 'aspect-[9/16]' : 'aspect-video'} overflow-hidden bg-neutral-200`}>
-                    <ImageWithFallback src={item.image} fallbackSrc={item.fallbackSrc} alt={item.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
-                      <div className="w-12 h-12 rounded-full bg-white/25 backdrop-blur-md border border-white/30 flex items-center justify-center text-white scale-75 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300 shadow-xl group-hover:rotate-6">
-                        <Play size={18} fill="currentColor" className="ml-0.5" />
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0">
+                {filteredCinematographyWorks.slice(0, visibleCinematography).map((item) => (
+                  <div key={item.id} className="group cursor-pointer relative overflow-hidden" onClick={() => setPlayingItem(item)}>
+                    <div className={`relative ${item.category === 'VERTICAL' ? 'aspect-[9/16]' : 'aspect-video'} overflow-hidden bg-[#0c0c0f]`}>
+                      <ImageWithFallback src={item.image} fallbackSrc={item.fallbackSrc} alt={item.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+                        <div className="w-12 h-12 rounded-full bg-white/25 backdrop-blur-md border border-white/30 flex items-center justify-center text-white scale-75 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300 shadow-xl group-hover:rotate-6">
+                          <Play size={18} fill="currentColor" className="ml-0.5" />
+                        </div>
                       </div>
-                    </div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent flex flex-col justify-end p-6 opacity-0 group-hover:opacity-100 transition-all duration-400">
-                      <h3 className="text-white mb-2 text-xl font-bold translate-y-3 group-hover:translate-y-0 transition-transform duration-300">{item.title}</h3>
-                      <div className="flex gap-2 flex-wrap translate-y-3 group-hover:translate-y-0 transition-transform duration-300 delay-75">
-                        {item.tags.map((tag) => (
-                          <span key={tag} className="px-2 py-0.5 bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold uppercase tracking-widest">{tag}</span>
-                        ))}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent flex flex-col justify-end p-6 opacity-0 group-hover:opacity-100 transition-all duration-400">
+                        <h3 className="text-white mb-2 text-xl font-bold translate-y-3 group-hover:translate-y-0 transition-transform duration-300">{item.title}</h3>
+                        <div className="flex gap-2 flex-wrap translate-y-3 group-hover:translate-y-0 transition-transform duration-300 delay-75">
+                          {item.tags.map((tag) => (
+                            <span key={tag} className="px-2 py-0.5 bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold uppercase tracking-widest">{tag}</span>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
+                ))}
+              </div>
+              {filteredCinematographyWorks.length > visibleCinematography && (
+                <div className="flex justify-center mt-16">
+                  <button
+                    onClick={() => setVisibleCinematography(prev => prev + 18)}
+                    className="px-8 py-3.5 bg-black text-white rounded-full text-xs font-bold uppercase tracking-widest hover:bg-neutral-800 transition-all cursor-pointer btn-tactile shadow-lg"
+                  >
+                    Load More Works ({filteredCinematographyWorks.length - visibleCinematography} remaining)
+                  </button>
                 </div>
-              ))}
-            </div>
+              )}
+            </>
           ) : (
             <div className="py-20 text-center border border-dashed border-black/10 rounded-xl">
               <p className="text-black/40 uppercase tracking-[0.2em] text-xs font-bold">No cinematography works found.</p>
@@ -640,7 +692,7 @@ export default function App() {
             <div className="flex gap-0 min-w-max">
               {featuredWorks.map((item) => (
                 <div key={item.id} className="group cursor-pointer w-[340px] sm:w-[420px] md:w-[480px] flex-shrink-0 relative overflow-hidden" onClick={() => setPlayingItem(item)}>
-                  <div className="relative aspect-video overflow-hidden bg-neutral-200">
+                  <div className="relative aspect-video overflow-hidden bg-[#0c0c0f]">
                     <ImageWithFallback src={item.image} fallbackSrc={item.fallbackSrc} alt={item.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
                     {/* Centered micro-interaction play button on hover */}
@@ -694,7 +746,7 @@ export default function App() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0">
                 {filteredWorkItems.slice(0, colsCreative * 3).map((item) => (
                   <div key={item.id} className="group cursor-pointer relative overflow-hidden" onClick={() => setPlayingItem(item)}>
-                    <div className="relative aspect-video overflow-hidden bg-neutral-200">
+                    <div className="relative aspect-video overflow-hidden bg-[#0c0c0f]">
                       <ImageWithFallback src={item.image} fallbackSrc={item.fallbackSrc} alt={item.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
                       <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
@@ -746,7 +798,7 @@ export default function App() {
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-0">
                 {filteredVerticalVideos.slice(0, colsPortrait * 2).map((item) => (
                   <div key={item.id} className="group cursor-pointer w-full relative overflow-hidden" onClick={() => setPlayingItem(item)}>
-                    <div className="relative aspect-[9/16] overflow-hidden bg-neutral-200">
+                    <div className="relative aspect-[9/16] overflow-hidden bg-[#0c0c0f]">
                       <ImageWithFallback src={item.image} fallbackSrc={item.fallbackSrc} alt={item.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
                       <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
@@ -798,7 +850,7 @@ export default function App() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0">
                 {cinematographyWorks.slice(0, colsCreative * 3).map((item) => (
                   <div key={item.id} className="group cursor-pointer relative overflow-hidden" onClick={() => setPlayingItem(item)}>
-                    <div className={`relative ${item.category === 'VERTICAL' ? 'aspect-[9/16]' : 'aspect-video'} overflow-hidden bg-neutral-200`}>
+                    <div className={`relative ${item.category === 'VERTICAL' ? 'aspect-[9/16]' : 'aspect-video'} overflow-hidden bg-[#0c0c0f]`}>
                       <ImageWithFallback src={item.image} fallbackSrc={item.fallbackSrc} alt={item.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
                       <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
