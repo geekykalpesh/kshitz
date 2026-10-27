@@ -88,8 +88,8 @@ export const NavBody = ({ children, className, visible }: NavBodyProps) => {
         y: visible ? 20 : 0,
       }}
       transition={{
-        duration: 0.35,
-        ease: [0.16, 1, 0.3, 1], // Apple-grade natural cubic bezier: fast, snappy & 100% symmetric
+        duration: 0.55,
+        ease: [0.25, 1, 0.5, 1], // Luxurious, silky smooth ease-out curve
       }}
       style={{
         minWidth: "620px",
@@ -163,8 +163,8 @@ export const MobileNav = ({ children, className, visible }: MobileNavProps) => {
         y: visible ? 16 : 0,
       }}
       transition={{
-        duration: 0.35,
-        ease: [0.16, 1, 0.3, 1],
+        duration: 0.55,
+        ease: [0.25, 1, 0.5, 1],
       }}
       className={cn(
         "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between px-5 py-3 lg:hidden pointer-events-auto",
