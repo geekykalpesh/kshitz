@@ -3,6 +3,7 @@ import { db } from '../db/index.js';
 import { works, NewWork } from '../db/schema.js';
 import { eq, asc } from 'drizzle-orm';
 import { authenticateToken, AuthenticatedRequest } from '../middleware/auth.js';
+import { convertInstagramUrlToCleanVideo } from '../lib/instagramConverter.js';
 
 const router = Router();
 
@@ -46,9 +47,15 @@ router.post('/', authenticateToken, async (req: AuthenticatedRequest, res: Respo
       return;
     }
 
+    // Automatically convert Instagram links to clean ImageKit video URLs
+    let cleanVideoLink = videoLink || '';
+    if (cleanVideoLink.includes('instagram.com')) {
+      cleanVideoLink = await convertInstagramUrlToCleanVideo(cleanVideoLink);
+    }
+
     const newWork: NewWork = {
       title,
-      videoLink: videoLink || '',
+      videoLink: cleanVideoLink,
       imageThumbnailLink: imageThumbnailLink || '',
       tags: tags || '',
       category: (category || 'HORIZONTAL').toUpperCase(),
@@ -75,11 +82,16 @@ router.put('/:id', authenticateToken, async (req: AuthenticatedRequest, res: Res
       return;
     }
 
+    let cleanVideoLink = videoLink;
+    if (cleanVideoLink && cleanVideoLink.includes('instagram.com') && cleanVideoLink !== existing[0].videoLink) {
+      cleanVideoLink = await convertInstagramUrlToCleanVideo(cleanVideoLink);
+    }
+
     const updated = await db
       .update(works)
       .set({
         title: title ?? existing[0].title,
-        videoLink: videoLink ?? existing[0].videoLink,
+        videoLink: cleanVideoLink ?? existing[0].videoLink,
         imageThumbnailLink: imageThumbnailLink ?? existing[0].imageThumbnailLink,
         tags: tags ?? existing[0].tags,
         category: category ? category.toUpperCase() : existing[0].category,
