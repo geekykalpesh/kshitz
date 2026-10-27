@@ -64,14 +64,14 @@ function authHeaders() {
 }
 
 // Fetch all works (public) with stale-while-revalidate and timeout fallback
-export async function fetchWorks(forceFresh = false): Promise<WorkItem[]> {
+export async function fetchWorks(forceFresh = true): Promise<WorkItem[]> {
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 12000);
 
-    const response = await fetch(`${API_BASE}/works`, {
+    const response = await fetch(`${API_BASE}/works?t=${Date.now()}`, {
       signal: controller.signal,
-      cache: forceFresh ? 'reload' : 'default',
+      cache: 'no-store',
     });
     clearTimeout(timeoutId);
 
@@ -246,4 +246,39 @@ export async function reorderWorks(items: { id: number; displayOrder: number }[]
 
 export function adminLogout() {
   localStorage.removeItem('admin_token');
+}
+
+export interface SiteSettings {
+  hero_bg_url?: string;
+  hero_bg_type?: 'video' | 'image' | 'none';
+  [key: string]: string | undefined;
+}
+
+export async function fetchSettings(): Promise<SiteSettings> {
+  try {
+    const res = await fetch(`${API_BASE}/settings?t=${Date.now()}`, { cache: 'no-store' });
+    if (!res.ok) throw new Error('Failed to load settings');
+    return await res.json();
+  } catch (err) {
+    console.warn('Could not fetch settings, returning defaults:', err);
+    return {
+      hero_bg_url: 'https://ik.imagekit.io/geekykalpesh/portfolio/hero/hero-bg_oPMA23VnnZ.mp4',
+      hero_bg_type: 'video',
+    };
+  }
+}
+
+export async function updateSettings(settings: Record<string, string>): Promise<SiteSettings> {
+  const response = await fetch(`${API_BASE}/settings`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify(settings),
+  });
+
+  if (!response.ok) {
+    const err = await response.json();
+    throw new Error(err.error || 'Failed to update settings');
+  }
+
+  return response.json();
 }

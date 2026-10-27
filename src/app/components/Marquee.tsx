@@ -26,12 +26,14 @@ export function Marquee() {
   ];
 
   return (
-    <div className="relative overflow-hidden bg-white py-6 md:py-8 border-y border-black/5 flex flex-col justify-center">
+    <div className="relative overflow-hidden bg-white py-8 md:py-12 border-y border-neutral-200 flex flex-col justify-center">
       <div className="mb-4 text-center">
-        <h3 className="text-sm font-bold tracking-widest uppercase text-black/60">Collaborated With</h3>
+        <h3 className="text-xs font-bold tracking-[0.25em] uppercase text-neutral-500">
+          Collaborated With
+        </h3>
       </div>
 
-      <div className="relative flex overflow-hidden py-0">
+      <div className="relative flex overflow-hidden py-1">
         {/* First group */}
         <div className="flex animate-marquee whitespace-nowrap items-center">
           {logos.map((logo, index) => (
@@ -42,8 +44,8 @@ export function Marquee() {
               <img
                 src={logo.src}
                 alt={logo.alt}
-                className="h-16 md:h-24 w-auto object-contain opacity-100 transition-all duration-500 group-hover:scale-110"
-                style={{ minWidth: '150px' }}
+                className="h-14 md:h-20 w-auto object-contain opacity-100 transition-all duration-300 group-hover:scale-105"
+                style={{ minWidth: '140px' }}
               />
             </div>
           ))}
@@ -59,17 +61,17 @@ export function Marquee() {
               <img
                 src={logo.src}
                 alt={logo.alt}
-                className="h-16 md:h-24 w-auto object-contain opacity-100 transition-all duration-500 group-hover:scale-110"
-                style={{ minWidth: '150px' }}
+                className="h-14 md:h-20 w-auto object-contain opacity-100 transition-all duration-300 group-hover:scale-105"
+                style={{ minWidth: '140px' }}
               />
             </div>
           ))}
         </div>
       </div>
 
-      {/* Gradient Overlays for smooth edges */}
-      <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none"></div>
-      <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none"></div>
+      {/* Gradient Overlays for smooth edges matching white background */}
+      <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+      <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
 
       <style>{`
         @keyframes marquee {
@@ -83,15 +85,15 @@ export function Marquee() {
         }
 
         .animate-marquee {
-          animation: marquee 30s linear infinite;
+          animation: marquee 35s linear infinite;
         }
 
         .animate-marquee2 {
-          animation: marquee2 30s linear infinite;
+          animation: marquee2 35s linear infinite;
         }
 
-        .relative:hover .animate-marquee,
-        .relative:hover .animate-marquee2 {
+        .animate-marquee:hover,
+        .animate-marquee2:hover {
           animation-play-state: paused;
         }
       `}</style>
