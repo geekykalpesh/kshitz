@@ -8,7 +8,7 @@ import {
   useMotionValueEvent,
 } from "motion/react";
 
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 
 
 interface NavbarProps {
@@ -51,26 +51,18 @@ interface MobileNavMenuProps {
 }
 
 export const Navbar = ({ children, className }: NavbarProps) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollY } = useScroll({
-    target: ref,
-    offset: ["start start", "end start"],
-  });
   const [visible, setVisible] = useState<boolean>(false);
 
-  useMotionValueEvent(scrollY, "change", (latest) => {
-    if (latest > 100) {
-      setVisible(true);
-    } else {
-      setVisible(false);
-    }
-  });
+  useEffect(() => {
+    const handleScroll = () => {
+      setVisible(window.scrollY > 80);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <motion.div
-      ref={ref}
-      className={cn("fixed inset-x-0 top-0 z-50 w-full", className)}
-    >
+    <div className={cn("fixed inset-x-0 top-0 z-50 w-full pointer-events-none", className)}>
       {React.Children.map(children, (child) =>
         React.isValidElement(child)
           ? React.cloneElement(
@@ -79,31 +71,31 @@ export const Navbar = ({ children, className }: NavbarProps) => {
             )
           : child,
       )}
-    </motion.div>
+    </div>
   );
 };
 
 export const NavBody = ({ children, className, visible }: NavBodyProps) => {
   return (
     <motion.div
+      initial={false}
       animate={{
-        backdropFilter: visible ? "blur(16px)" : "none",
+        backdropFilter: visible ? "blur(20px)" : "blur(0px)",
         boxShadow: visible
-          ? "0 20px 40px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.12)"
+          ? "0 20px 40px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.15)"
           : "none",
         width: visible ? "55%" : "100%",
         y: visible ? 20 : 0,
       }}
       transition={{
-        type: "spring",
-        stiffness: 200,
-        damping: 50,
+        duration: 0.35,
+        ease: [0.16, 1, 0.3, 1], // Apple-grade natural cubic bezier: fast, snappy & 100% symmetric
       }}
       style={{
         minWidth: "620px",
       }}
       className={cn(
-        "relative z-[60] mx-auto hidden w-full max-w-7xl flex-row items-center justify-between self-start rounded-full px-6 py-3 lg:flex transition-all duration-300",
+        "relative z-[60] mx-auto hidden w-full max-w-7xl flex-row items-center justify-between self-start rounded-full px-6 py-3 lg:flex pointer-events-auto",
         visible
           ? "bg-zinc-950/85 border border-white/20 backdrop-blur-xl shadow-2xl"
           : "bg-transparent border border-transparent",
@@ -160,22 +152,22 @@ export const NavItems = ({ items, className, onItemClick, visible }: NavItemsPro
 export const MobileNav = ({ children, className, visible }: MobileNavProps) => {
   return (
     <motion.div
+      initial={false}
       animate={{
-        backdropFilter: visible ? "blur(16px)" : "none",
+        backdropFilter: visible ? "blur(20px)" : "blur(0px)",
         boxShadow: visible
-          ? "0 20px 40px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.12)"
+          ? "0 20px 40px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.15)"
           : "none",
         width: visible ? "92%" : "100%",
         borderRadius: visible ? "1.25rem" : "2rem",
         y: visible ? 16 : 0,
       }}
       transition={{
-        type: "spring",
-        stiffness: 200,
-        damping: 50,
+        duration: 0.35,
+        ease: [0.16, 1, 0.3, 1],
       }}
       className={cn(
-        "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between px-5 py-3 lg:hidden transition-all duration-300",
+        "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between px-5 py-3 lg:hidden pointer-events-auto",
         visible ? "bg-zinc-950/90 border border-white/20 backdrop-blur-xl" : "bg-transparent",
         className,
       )}
