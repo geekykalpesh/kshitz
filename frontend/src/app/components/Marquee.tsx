@@ -26,9 +26,9 @@ export function Marquee() {
   ];
 
   return (
-    <div className="relative overflow-hidden bg-black py-8 md:py-12 border-y border-white/10 flex flex-col justify-center">
+    <div className="relative overflow-hidden bg-white py-6 md:py-8 border-y border-black/5 flex flex-col justify-center">
       <div className="mb-4 text-center">
-        <h3 className="text-sm font-bold tracking-widest uppercase text-white/40">Collaborated With</h3>
+        <h3 className="text-sm font-bold tracking-widest uppercase text-black/60">Collaborated With</h3>
       </div>
 
       <div className="relative flex overflow-hidden py-0">
@@ -42,7 +42,7 @@ export function Marquee() {
               <img
                 src={logo.src}
                 alt={logo.alt}
-                className="h-16 md:h-24 w-auto object-contain opacity-80 brightness-0 invert transition-all duration-500 group-hover:opacity-100 group-hover:scale-110"
+                className="h-16 md:h-24 w-auto object-contain opacity-100 transition-all duration-500 group-hover:scale-110"
                 style={{ minWidth: '150px' }}
               />
             </div>
@@ -59,7 +59,7 @@ export function Marquee() {
               <img
                 src={logo.src}
                 alt={logo.alt}
-                className="h-16 md:h-24 w-auto object-contain opacity-80 brightness-0 invert transition-all duration-500 group-hover:opacity-100 group-hover:scale-110"
+                className="h-16 md:h-24 w-auto object-contain opacity-100 transition-all duration-500 group-hover:scale-110"
                 style={{ minWidth: '150px' }}
               />
             </div>
@@ -68,8 +68,8 @@ export function Marquee() {
       </div>
 
       {/* Gradient Overlays for smooth edges */}
-      <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-black to-transparent z-10 pointer-events-none"></div>
-      <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-black to-transparent z-10 pointer-events-none"></div>
+      <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none"></div>
+      <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none"></div>
 
       <style>{`
         @keyframes marquee {

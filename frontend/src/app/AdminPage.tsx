@@ -1045,28 +1045,28 @@ export default function AdminPage() {
   // Creative Archive view
   if (currentPage === 'creative-archive') {
     return (
-      <div className="min-h-screen bg-black text-white font-sans selection:bg-white selection:text-black animate-in fade-in duration-300">
-        <nav className="fixed top-0 left-0 w-full z-50 bg-black/95 backdrop-blur-md border-b border-white/10">
+      <div className="min-h-screen bg-white text-black font-sans selection:bg-black selection:text-white animate-in fade-in duration-300">
+        <nav className="fixed top-0 left-0 w-full z-50 bg-white/95 backdrop-blur-md border-b border-black/5">
           <div className="max-w-7xl mx-auto px-6 lg:px-8 h-20 flex items-center justify-between">
             <button
               onClick={() => { setCurrentPage('home'); window.scrollTo({ top: 0, behavior: 'instant' }); }}
-              className="group flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-white hover:text-white/60 transition-all cursor-pointer btn-tactile"
+              className="group flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-black hover:text-black/60 transition-all cursor-pointer btn-tactile"
             >
               <ArrowLeft size={16} className="transition-transform duration-300 group-hover:-translate-x-1" />
               <span>Back to Portfolio</span>
             </button>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white text-black flex items-center justify-center font-bold text-xl shadow-md">K</div>
+              <div className="w-10 h-10 bg-black text-white flex items-center justify-center font-bold text-xl shadow-md">K</div>
               <h1 className="text-sm font-bold tracking-widest uppercase hidden sm:block">Kshitij Rathore (Admin)</h1>
             </div>
           </div>
         </nav>
 
-        <div className="w-full pt-32 pb-24">
-          <div className="max-w-7xl mx-auto px-6 lg:px-8 mb-16 flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-white/10 pb-8">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 pt-32 pb-24">
+          <div className="flex flex-col md:flex-row md:items-center justify-between mb-16 gap-8 border-b border-black/5 pb-8">
             <div>
               <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-400 mb-2">Creative Collection</p>
-              <h2 className="text-4xl font-light tracking-tight text-white">CREATIVE ARCHIVE ({filteredWorkItems.length})</h2>
+              <h2 className="text-4xl font-light tracking-tight text-black">CREATIVE ARCHIVE ({filteredWorkItems.length})</h2>
             </div>
             {loading ? (
               <ShimmerFilters />
@@ -1074,7 +1074,7 @@ export default function AdminPage() {
               <div className="flex gap-3 flex-wrap">
                 {['all', 'editor', 'colorist', 'motion', 'dop'].map((filter) => (
                   <button key={filter} onClick={() => toggleFilter(filter)}
-                    className={`px-5 py-2.5 border border-white/20 rounded-full text-xs font-bold uppercase tracking-widest transition-all cursor-pointer btn-tactile ${activeFilters.includes(filter) ? 'bg-white text-black shadow-md' : 'text-white/70 hover:bg-white/10'}`}
+                    className={`px-5 py-2.5 border border-black rounded-full text-xs font-bold uppercase tracking-widest transition-all cursor-pointer btn-tactile ${activeFilters.includes(filter) ? 'bg-black text-white shadow-md' : 'hover:bg-neutral-100'}`}
                   >
                     {filter === 'all' ? 'All' : filter === 'dop' ? 'DOP' : filter.charAt(0).toUpperCase() + filter.slice(1)}
                   </button>
@@ -1102,26 +1102,26 @@ export default function AdminPage() {
   // Portrait Cinema view
   if (currentPage === 'portrait-cinema') {
     return (
-      <div className="min-h-screen bg-black text-white font-sans selection:bg-white selection:text-black animate-in fade-in duration-300">
-        <nav className="fixed top-0 left-0 w-full z-50 bg-black/95 backdrop-blur-md border-b border-white/10">
+      <div className="min-h-screen bg-white text-black font-sans selection:bg-black selection:text-white animate-in fade-in duration-300">
+        <nav className="fixed top-0 left-0 w-full z-50 bg-white/95 backdrop-blur-md border-b border-black/5">
           <div className="max-w-7xl mx-auto px-6 lg:px-8 h-20 flex items-center justify-between">
             <button onClick={() => { setCurrentPage('home'); window.scrollTo({ top: 0, behavior: 'instant' }); }}
-              className="group flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-white hover:text-white/60 transition-all cursor-pointer btn-tactile">
+              className="group flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-black hover:text-black/60 transition-all cursor-pointer btn-tactile">
               <ArrowLeft size={16} className="transition-transform duration-300 group-hover:-translate-x-1" />
               <span>Back to Portfolio</span>
             </button>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white text-black flex items-center justify-center font-bold text-xl shadow-md">K</div>
+              <div className="w-10 h-10 bg-black text-white flex items-center justify-center font-bold text-xl shadow-md">K</div>
               <h1 className="text-sm font-bold tracking-widest uppercase hidden sm:block">Kshitij Rathore (Admin)</h1>
             </div>
           </div>
         </nav>
 
-        <div className="w-full pt-32 pb-24">
-          <div className="max-w-7xl mx-auto px-6 lg:px-8 mb-16 flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-white/10 pb-8">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 pt-32 pb-24">
+          <div className="flex flex-col md:flex-row md:items-center justify-between mb-16 gap-8 border-b border-black/5 pb-8">
             <div>
               <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-400 mb-2">Cinematic Shorts</p>
-              <h2 className="text-4xl font-light tracking-tight text-white">VERTICAL ({filteredVerticalVideos.length})</h2>
+              <h2 className="text-4xl font-light tracking-tight text-black">VERTICAL ({filteredVerticalVideos.length})</h2>
             </div>
             {loading ? (
               <ShimmerFilters />
@@ -1129,7 +1129,7 @@ export default function AdminPage() {
               <div className="flex gap-3 flex-wrap">
                 {['all', 'editor', 'colorist', 'motion', 'dop'].map((filter) => (
                   <button key={filter} onClick={() => toggleFilter(filter)}
-                    className={`px-5 py-2.5 border border-white/20 rounded-full text-xs font-bold uppercase tracking-widest transition-all cursor-pointer btn-tactile ${activeFilters.includes(filter) ? 'bg-white text-black shadow-md' : 'text-white/70 hover:bg-white/10'}`}>
+                    className={`px-5 py-2.5 border border-black rounded-full text-xs font-bold uppercase tracking-widest transition-all cursor-pointer btn-tactile ${activeFilters.includes(filter) ? 'bg-black text-white shadow-md' : 'hover:bg-neutral-100'}`}>
                     {filter === 'all' ? 'All' : filter === 'dop' ? 'DOP' : filter.charAt(0).toUpperCase() + filter.slice(1)}
                   </button>
                 ))}
@@ -1156,26 +1156,26 @@ export default function AdminPage() {
   // Cinematography view
   if (currentPage === 'cinematography') {
     return (
-      <div className="min-h-screen bg-black text-white font-sans selection:bg-white selection:text-black animate-in fade-in duration-300">
-        <nav className="fixed top-0 left-0 w-full z-50 bg-black/95 backdrop-blur-md border-b border-white/10">
+      <div className="min-h-screen bg-white text-black font-sans selection:bg-black selection:text-white animate-in fade-in duration-300">
+        <nav className="fixed top-0 left-0 w-full z-50 bg-white/95 backdrop-blur-md border-b border-black/5">
           <div className="max-w-7xl mx-auto px-6 lg:px-8 h-20 flex items-center justify-between">
             <button onClick={() => { setCurrentPage('home'); window.scrollTo({ top: 0, behavior: 'instant' }); }}
-              className="group flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-white hover:text-white/60 transition-all cursor-pointer btn-tactile">
+              className="group flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-black hover:text-black/60 transition-all cursor-pointer btn-tactile">
               <ArrowLeft size={16} className="transition-transform duration-300 group-hover:-translate-x-1" />
               <span>Back to Portfolio</span>
             </button>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white text-black flex items-center justify-center font-bold text-xl shadow-md">K</div>
+              <div className="w-10 h-10 bg-black text-white flex items-center justify-center font-bold text-xl shadow-md">K</div>
               <h1 className="text-sm font-bold tracking-widest uppercase hidden sm:block">Kshitij Rathore (Admin)</h1>
             </div>
           </div>
         </nav>
 
-        <div className="w-full pt-32 pb-24">
-          <div className="max-w-7xl mx-auto px-6 lg:px-8 mb-16 flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-white/10 pb-8">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 pt-32 pb-24">
+          <div className="flex flex-col md:flex-row md:items-center justify-between mb-16 gap-8 border-b border-black/5 pb-8">
             <div>
               <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-400 mb-2">Director of Photography</p>
-              <h2 className="text-4xl font-light tracking-tight text-white">CINEMATOGRAPHY ({filteredCinematographyWorks.length})</h2>
+              <h2 className="text-4xl font-light tracking-tight text-black">CINEMATOGRAPHY ({filteredCinematographyWorks.length})</h2>
             </div>
             {loading ? (
               <ShimmerFilters />
@@ -1183,7 +1183,7 @@ export default function AdminPage() {
               <div className="flex gap-3 flex-wrap">
                 {['all', 'editor', 'colorist', 'motion', 'dop'].map((filter) => (
                   <button key={filter} onClick={() => toggleFilter(filter)}
-                    className={`px-5 py-2.5 border border-white/20 rounded-full text-xs font-bold uppercase tracking-widest transition-all cursor-pointer btn-tactile ${activeFilters.includes(filter) ? 'bg-white text-black shadow-md' : 'text-white/70 hover:bg-white/10'}`}
+                    className={`px-5 py-2.5 border border-black rounded-full text-xs font-bold uppercase tracking-widest transition-all cursor-pointer btn-tactile ${activeFilters.includes(filter) ? 'bg-black text-white shadow-md' : 'hover:bg-neutral-100'}`}
                   >
                     {filter === 'all' ? 'All' : filter === 'dop' ? 'DOP' : filter.charAt(0).toUpperCase() + filter.slice(1)}
                   </button>
@@ -1210,7 +1210,7 @@ export default function AdminPage() {
 
   // Main Home view
   return (
-    <div className="min-h-screen bg-black text-white font-sans selection:bg-white selection:text-black">
+    <div className="min-h-screen bg-white text-black font-sans selection:bg-black selection:text-white">
       {/* Hidden file input for tile uploads */}
       <input
         ref={tileFileInputRef}
@@ -1428,23 +1428,23 @@ export default function AdminPage() {
       </section>
 
       {/* ─── 01 Recent (Featured Works Carousel) ─── */}
-      <section id="works" className="py-20 bg-black border-t border-white/10">
+      <section id="works" className="py-20 bg-neutral-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between mb-12">
-          <h2 className="text-2xl font-joyride font-normal tracking-wide text-white uppercase flex items-center gap-4">
-            <span className="text-sm px-3.5 py-1 font-bold font-sans bg-white text-black rounded-full">01</span>
+          <h2 className="text-2xl font-joyride font-normal tracking-wide text-black uppercase flex items-center gap-4">
+            <span className="text-sm px-3.5 py-1 font-bold font-sans bg-black text-white rounded-full">01</span>
             Recent
           </h2>
           <div className="flex gap-4">
             <button
               onClick={() => scrollRef.current?.scrollBy({ left: -500, behavior: 'smooth' })}
-              className="p-3 border border-white/20 rounded-full hover:bg-black hover:text-white hover:scale-110 active:scale-90 transition-all duration-300 flex items-center justify-center cursor-pointer shadow-sm hover:shadow-md"
+              className="p-3 border border-black rounded-full hover:bg-black hover:text-white hover:scale-110 active:scale-90 transition-all duration-300 flex items-center justify-center cursor-pointer shadow-sm hover:shadow-md"
               aria-label="Scroll left"
             >
               <ChevronLeft size={20} />
             </button>
             <button
               onClick={() => scrollRef.current?.scrollBy({ left: 500, behavior: 'smooth' })}
-              className="p-3 border border-white/20 rounded-full hover:bg-black hover:text-white hover:scale-110 active:scale-90 transition-all duration-300 flex items-center justify-center cursor-pointer shadow-sm hover:shadow-md"
+              className="p-3 border border-black rounded-full hover:bg-black hover:text-white hover:scale-110 active:scale-90 transition-all duration-300 flex items-center justify-center cursor-pointer shadow-sm hover:shadow-md"
               aria-label="Scroll right"
             >
               <ChevronRight size={20} />
@@ -1470,11 +1470,11 @@ export default function AdminPage() {
       </section>
 
       {/* ─── 02 All Works (Grid with Filter & Drag) ─── */}
-      <section id="archive" className="py-20 bg-black border-t border-white/10">
+      <section id="archive" className="py-20 px-6 lg:px-8 border-t border-black/5">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-8">
-            <h2 className="text-2xl font-joyride font-normal tracking-wide text-white uppercase flex items-center gap-4">
-              <span className="text-sm px-3.5 py-1 font-bold font-sans bg-white text-black rounded-full">02</span>
+            <h2 className="text-2xl font-joyride font-normal tracking-wide text-black uppercase flex items-center gap-4">
+              <span className="text-sm px-3.5 py-1 font-bold font-sans bg-black text-white rounded-full">02</span>
               All
             </h2>
             {loading ? (
@@ -1485,8 +1485,8 @@ export default function AdminPage() {
                   <button
                     key={filter}
                     onClick={() => toggleFilter(filter)}
-                    className={`px-5 py-2.5 border border-white/20 rounded-full text-xs font-bold uppercase tracking-widest transition-all cursor-pointer btn-tactile ${
-                      activeFilters.includes(filter) ? 'bg-white text-black shadow-md' : 'text-white/70 hover:bg-white/10'
+                    className={`px-5 py-2.5 border border-black rounded-full text-xs font-bold uppercase tracking-widest transition-all cursor-pointer btn-tactile ${
+                      activeFilters.includes(filter) ? 'bg-black text-white shadow-md' : 'hover:bg-neutral-100'
                     }`}
                   >
                     {filter === 'all' ? 'All' : filter === 'dop' ? 'DOP' : filter.charAt(0).toUpperCase() + filter.slice(1)}
@@ -1509,7 +1509,7 @@ export default function AdminPage() {
                 <div className="flex justify-center mt-16">
                   <button
                     onClick={() => { setCurrentPage('creative-archive'); window.scrollTo({ top: 0, behavior: 'instant' }); }}
-                    className="px-12 py-5 border border-white/25 text-[11px] font-bold uppercase tracking-[0.2em] text-white hover:bg-white hover:text-black transition-all duration-300 rounded-full cursor-pointer btn-tactile hover:shadow-lg"
+                    className="px-12 py-5 border border-black text-[11px] font-bold uppercase tracking-[0.2em] text-black hover:bg-black hover:text-white transition-all duration-300 rounded-full cursor-pointer btn-tactile hover:shadow-lg"
                   >
                     See More
                   </button>
@@ -1517,18 +1517,18 @@ export default function AdminPage() {
               )}
             </>
           ) : (
-            <div className="py-20 text-center border border-dashed border-white/15 rounded-xl">
-              <p className="text-white/40 uppercase tracking-[0.2em] text-xs font-bold">No horizontal works found for this selection.</p>
+            <div className="py-20 text-center border border-dashed border-black/10 rounded-xl">
+              <p className="text-black/40 uppercase tracking-[0.2em] text-xs font-bold">No horizontal works found for this selection.</p>
             </div>
           )}
         </div>
       </section>
 
       {/* ─── 03 Vertical Works ─── */}
-      <section id="verticals" className="py-20 bg-black border-t border-white/10">
+      <section id="verticals" className="py-20 px-6 lg:px-8 bg-neutral-50 border-t border-black/5">
         <div className="max-w-7xl mx-auto">
-          <h2 className="mb-12 text-2xl font-joyride font-normal tracking-wide text-white uppercase flex items-center gap-4">
-            <span className="text-sm px-3.5 py-1 font-bold font-sans bg-white text-black rounded-full">03</span>
+          <h2 className="mb-12 text-2xl font-joyride font-normal tracking-wide text-black uppercase flex items-center gap-4">
+            <span className="text-sm px-3.5 py-1 font-bold font-sans bg-black text-white rounded-full">03</span>
             VERTICAL
           </h2>
 
@@ -1545,7 +1545,7 @@ export default function AdminPage() {
                 <div className="flex justify-center mt-16">
                   <button
                     onClick={() => { setCurrentPage('portrait-cinema'); window.scrollTo({ top: 0, behavior: 'instant' }); }}
-                    className="px-12 py-5 border border-white/25 text-[11px] font-bold uppercase tracking-[0.2em] text-white hover:bg-white hover:text-black transition-all duration-300 rounded-full cursor-pointer btn-tactile hover:shadow-lg"
+                    className="px-12 py-5 border border-black text-[11px] font-bold uppercase tracking-[0.2em] text-black hover:bg-black hover:text-white transition-all duration-300 rounded-full cursor-pointer btn-tactile hover:shadow-lg"
                   >
                     See More
                   </button>
@@ -1553,18 +1553,18 @@ export default function AdminPage() {
               )}
             </>
           ) : (
-            <div className="py-20 text-center border border-dashed border-white/15 rounded-xl">
-              <p className="text-white/40 uppercase tracking-[0.2em] text-xs font-bold">No vertical works found.</p>
+            <div className="py-20 text-center border border-dashed border-black/10 rounded-xl">
+              <p className="text-black/40 uppercase tracking-[0.2em] text-xs font-bold">No vertical works found.</p>
             </div>
           )}
         </div>
       </section>
 
       {/* ─── 04 Cinematography Works ─── */}
-      <section id="cinematography" className="py-20 bg-black border-t border-white/10">
+      <section id="cinematography" className="py-20 px-6 lg:px-8 bg-white border-t border-black/5">
         <div className="max-w-7xl mx-auto">
-          <h2 className="mb-12 text-2xl font-joyride font-normal tracking-wide text-white uppercase flex items-center gap-4">
-            <span className="text-sm px-3.5 py-1 font-bold font-sans bg-white text-black rounded-full">04</span>
+          <h2 className="mb-12 text-2xl font-joyride font-normal tracking-wide text-black uppercase flex items-center gap-4">
+            <span className="text-sm px-3.5 py-1 font-bold font-sans bg-black text-white rounded-full">04</span>
             CINEMATOGRAPHY
           </h2>
 
@@ -1581,7 +1581,7 @@ export default function AdminPage() {
                 <div className="flex justify-center mt-16">
                   <button
                     onClick={() => { setCurrentPage('cinematography'); window.scrollTo({ top: 0, behavior: 'instant' }); }}
-                    className="px-12 py-5 border border-white/25 text-[11px] font-bold uppercase tracking-[0.2em] text-white hover:bg-white hover:text-black transition-all duration-300 rounded-full cursor-pointer btn-tactile hover:shadow-lg"
+                    className="px-12 py-5 border border-black text-[11px] font-bold uppercase tracking-[0.2em] text-black hover:bg-black hover:text-white transition-all duration-300 rounded-full cursor-pointer btn-tactile hover:shadow-lg"
                   >
                     See More
                   </button>
@@ -1589,8 +1589,8 @@ export default function AdminPage() {
               )}
             </>
           ) : (
-            <div className="py-20 text-center border border-dashed border-white/15 rounded-xl">
-              <p className="text-white/40 uppercase tracking-[0.2em] text-xs font-bold">No cinematography works found.</p>
+            <div className="py-20 text-center border border-dashed border-black/10 rounded-xl">
+              <p className="text-black/40 uppercase tracking-[0.2em] text-xs font-bold">No cinematography works found.</p>
             </div>
           )}
         </div>
