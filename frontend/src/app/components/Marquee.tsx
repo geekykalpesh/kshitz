@@ -42,7 +42,9 @@ export function Marquee() {
               <img
                 src={logo.src}
                 alt={logo.alt}
-                className="h-16 md:h-24 w-auto object-contain opacity-80 brightness-0 invert transition-all duration-500 group-hover:opacity-100 group-hover:scale-110"
+                className={`h-16 md:h-24 w-auto object-contain transition-all duration-500 group-hover:scale-110 ${
+    logo.alt === "Ather" ? "brightness-0 invert opacity-90" : "opacity-100"
+  }`}
                 style={{ minWidth: '150px' }}
               />
             </div>
@@ -59,7 +61,9 @@ export function Marquee() {
               <img
                 src={logo.src}
                 alt={logo.alt}
-                className="h-16 md:h-24 w-auto object-contain opacity-80 brightness-0 invert transition-all duration-500 group-hover:opacity-100 group-hover:scale-110"
+                className={`h-16 md:h-24 w-auto object-contain transition-all duration-500 group-hover:scale-110 ${
+    logo.alt === "Ather" ? "brightness-0 invert opacity-90" : "opacity-100"
+  }`}
                 style={{ minWidth: '150px' }}
               />
             </div>
