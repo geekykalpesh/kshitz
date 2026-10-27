@@ -21,5 +21,12 @@ export const works = pgTable('works', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
+export const siteSettings = pgTable('site_settings', {
+  key: varchar('key', { length: 100 }).primaryKey(),
+  value: text('value').notNull().default(''),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
 export type Work = typeof works.$inferSelect;
 export type NewWork = typeof works.$inferInsert;
+export type SiteSetting = typeof siteSettings.$inferSelect;

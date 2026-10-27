@@ -14,7 +14,7 @@ import {
   MobileNavMenu,
 } from "@/components/ui/resizable-navbar";
 import { motion } from 'motion/react';
-import { fetchWorks } from '@/lib/api';
+import { fetchWorks, fetchSettings, SiteSettings } from '@/lib/api';
 import { transformWork, DisplayWorkItem, getInitialDisplayWorks } from '@/lib/transformWork';
 import { ShimmerCarousel, ShimmerGrid, ShimmerFilters } from './components/Shimmer';
 
@@ -110,12 +110,21 @@ export default function App() {
     return url || '';
   };
 
+  const [settings, setSettings] = useState<SiteSettings>({
+    hero_bg_url: 'https://ik.imagekit.io/geekykalpesh/portfolio/hero/hero-bg_oPMA23VnnZ.mp4',
+    hero_bg_type: 'video',
+  });
+
   useEffect(() => {
     let isMounted = true;
     const loadData = async () => {
       try {
-        const works = await fetchWorks();
+        const [works, siteSettings] = await Promise.all([
+          fetchWorks(),
+          fetchSettings(),
+        ]);
         if (!isMounted) return;
+        if (siteSettings) setSettings(siteSettings);
         if (works && works.length > 0) {
           const transformed = works
             .filter(w => w.title)
@@ -220,7 +229,6 @@ export default function App() {
 
   const navItems = [
     { name: "Home", link: "#home" },
-    { name: "About", link: "#about" },
     { name: "Contact", link: "#contact" },
   ];
 
@@ -576,9 +584,19 @@ export default function App() {
       </Navbar>
 
       <section id="home" className="relative min-h-screen px-6 lg:px-8 bg-black overflow-hidden flex items-center justify-center pt-28 pb-20">
-        <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover pointer-events-none z-0">
-          <source src="https://res.cloudinary.com/dvbarr6ni/video/upload/v1780090126/hero-bg_jxvbup.mp4" type="video/mp4" />
-        </video>
+        {settings.hero_bg_type === 'video' && settings.hero_bg_url && (
+          <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover pointer-events-none z-0">
+            <source src={settings.hero_bg_url} type="video/mp4" />
+            <source src="/hero-bg.mp4" type="video/mp4" />
+          </video>
+        )}
+        {settings.hero_bg_type === 'image' && settings.hero_bg_url && (
+          <img
+            src={settings.hero_bg_url}
+            alt="Hero Background"
+            className="absolute inset-0 w-full h-full object-cover pointer-events-none z-0"
+          />
+        )}
 
         <div className="absolute inset-0 bg-black/40 z-10 pointer-events-none" />
 
@@ -889,59 +907,6 @@ export default function App() {
 
       {/* Marquee component */}
       <Marquee />
-
-      {/* About Section */}
-      <section id="about" className="py-32 px-6 lg:px-8 border-t border-black/5 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-24">
-            <div className="space-y-12">
-              <h2 className="text-2xl font-joyride font-normal tracking-wide text-black uppercase flex items-center gap-4">
-                <span className="text-sm px-3.5 py-1 font-bold font-sans bg-black text-white rounded-full">05</span>
-                ABOUT
-              </h2>
-              <div className="space-y-8 text-neutral-800 text-lg md:text-xl font-light leading-relaxed">
-                <p>
-                  I'm Kshitij Rathore, a visual artist, filmmaker, and post-production specialist with over 7 years of experience crafting high-impact commercials, music videos, and cinematic promos.
-                </p>
-                <p>
-                  My work lives at the intersection of raw emotion and surgical precision. From high-energy brand campaigns to moody narrative pieces, I approach every frame with obsessive attention to color, pacing, and visual story.
-                </p>
-                <p>
-                  Over the years, I've had the privilege of collaborating with top brands including Netflix, Amazon Prime Video, Disney+ Hotstar, Swiggy, and CRED, working alongside legendary talents and cutting-edge creators across India.
-                </p>
-              </div>
-
-              <div className="pt-8 border-t border-black/10 grid grid-cols-2 sm:grid-cols-3 gap-8">
-                <div>
-                  <h4 className="text-3xl font-light tracking-tight text-black mb-1">7+</h4>
-                  <p className="text-xs uppercase tracking-widest text-neutral-500 font-bold">Years Experience</p>
-                </div>
-                <div>
-                  <h4 className="text-3xl font-light tracking-tight text-black mb-1">100+</h4>
-                  <p className="text-xs uppercase tracking-widest text-neutral-500 font-bold">Projects Delivered</p>
-                </div>
-                <div>
-                  <h4 className="text-3xl font-light tracking-tight text-black mb-1">50M+</h4>
-                  <p className="text-xs uppercase tracking-widest text-neutral-500 font-bold">Views Generated</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="relative">
-              <div className="aspect-[4/5] bg-neutral-100 overflow-hidden rounded-2xl relative shadow-2xl">
-                <ImageWithFallback
-                  src="/kshitiz-portrait.jpg"
-                  alt="Kshitij Rathore Portrait"
-                  className="w-full h-full object-cover object-[center_15%] grayscale hover:grayscale-0 transition-all duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-8">
-                  <p className="text-white text-xs uppercase tracking-[0.25em] font-bold">Mumbai &bull; Available Worldwide</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       <Footer />
 

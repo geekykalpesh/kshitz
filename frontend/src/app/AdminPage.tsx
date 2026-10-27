@@ -34,7 +34,10 @@ import {
   reorderWorks,
   adminLogin,
   verifyToken,
-  adminLogout
+  adminLogout,
+  fetchSettings,
+  updateSettings,
+  SiteSettings,
 } from '@/lib/api';
 import { transformWork, DisplayWorkItem, getInitialDisplayWorks } from '@/lib/transformWork';
 import { ShimmerCarousel, ShimmerGrid, ShimmerFilters } from './components/Shimmer';
@@ -416,14 +419,41 @@ export default function AdminPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Hero section background customizer state
+  const [settings, setSettings] = useState<SiteSettings>({
+    hero_bg_url: 'https://ik.imagekit.io/geekykalpesh/portfolio/hero/hero-bg_oPMA23VnnZ.mp4',
+    hero_bg_type: 'video',
+  });
+  const [isHeroEditOpen, setIsHeroEditOpen] = useState(false);
+  const [heroBgUrlInput, setHeroBgUrlInput] = useState('');
+  const [heroBgTypeInput, setHeroBgTypeInput] = useState<'video' | 'image' | 'none'>('video');
+  const [heroUploading, setHeroUploading] = useState(false);
+  const heroFileInputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     const checkAuth = async () => {
       const valid = await verifyToken();
       setIsAuthenticated(valid);
-      if (valid) loadWorks();
+      if (valid) {
+        loadWorks();
+        loadSettings();
+      }
     };
     checkAuth();
   }, []);
+
+  const loadSettings = async () => {
+    try {
+      const s = await fetchSettings();
+      if (s) {
+        setSettings(s);
+        setHeroBgUrlInput(s.hero_bg_url || '');
+        setHeroBgTypeInput((s.hero_bg_type as any) || 'video');
+      }
+    } catch (e) {
+      console.warn('Failed to load settings:', e);
+    }
+  };
 
   const loadWorks = async () => {
     try {
@@ -435,6 +465,70 @@ export default function AdminPage() {
       showToast('Error loading works: ' + err.message, 'error');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleHeroFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setHeroUploading(true);
+    try {
+      showToast('Uploading hero media...', 'info');
+      const res = await uploadMediaFile(file);
+      const isVid = file.type.startsWith('video/');
+      const detectedType = isVid ? 'video' : 'image';
+      
+      const newSettings = {
+        hero_bg_url: res.url,
+        hero_bg_type: detectedType,
+      };
+
+      await updateSettings(newSettings);
+      setSettings(prev => ({ ...prev, ...newSettings }));
+      setHeroBgUrlInput(res.url);
+      setHeroBgTypeInput(detectedType);
+      showToast('Hero background updated successfully!', 'success');
+      setIsHeroEditOpen(false);
+    } catch (err: any) {
+      showToast('Hero upload failed: ' + err.message, 'error');
+    } finally {
+      setHeroUploading(false);
+      if (heroFileInputRef.current) heroFileInputRef.current.value = '';
+    }
+  };
+
+  const handleSaveHeroSettings = async () => {
+    try {
+      showToast('Saving hero background settings...', 'info');
+      const newSettings = {
+        hero_bg_url: heroBgUrlInput.trim(),
+        hero_bg_type: heroBgTypeInput,
+      };
+      await updateSettings(newSettings);
+      setSettings(prev => ({ ...prev, ...newSettings }));
+      showToast('Hero background updated!', 'success');
+      setIsHeroEditOpen(false);
+    } catch (err: any) {
+      showToast('Failed to save hero settings: ' + err.message, 'error');
+    }
+  };
+
+  const handleRemoveHeroBg = async () => {
+    if (!window.confirm('Are you sure you want to remove the hero background?')) return;
+    try {
+      const newSettings = {
+        hero_bg_url: '',
+        hero_bg_type: 'none',
+      };
+      await updateSettings(newSettings);
+      setSettings(prev => ({ ...prev, ...newSettings }));
+      setHeroBgUrlInput('');
+      setHeroBgTypeInput('none');
+      showToast('Hero background removed', 'success');
+      setIsHeroEditOpen(false);
+    } catch (err: any) {
+      showToast('Failed to remove hero background: ' + err.message, 'error');
     }
   };
 
@@ -701,7 +795,6 @@ export default function AdminPage() {
 
   const navItems = [
     { name: "Home", link: "#home" },
-    { name: "About", link: "#about" },
     { name: "Contact", link: "#contact" },
   ];
 
@@ -1224,12 +1317,38 @@ export default function AdminPage() {
       </div>
 
       {/* Hero Section */}
-      <section id="home" className="relative min-h-screen px-6 lg:px-8 bg-black overflow-hidden flex items-center justify-center pt-28 pb-20">
-        <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover pointer-events-none z-0">
-          <source src="https://res.cloudinary.com/dvbarr6ni/video/upload/v1780090126/hero-bg_jxvbup.mp4" type="video/mp4" />
-        </video>
+      <section id="home" className="relative min-h-screen px-6 lg:px-8 bg-black overflow-hidden flex items-center justify-center pt-28 pb-20 group/hero">
+        {settings.hero_bg_type === 'video' && settings.hero_bg_url && (
+          <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover pointer-events-none z-0">
+            <source src={settings.hero_bg_url} type="video/mp4" />
+            <source src="/hero-bg.mp4" type="video/mp4" />
+          </video>
+        )}
+        {settings.hero_bg_type === 'image' && settings.hero_bg_url && (
+          <img
+            src={settings.hero_bg_url}
+            alt="Hero Background"
+            className="absolute inset-0 w-full h-full object-cover pointer-events-none z-0"
+          />
+        )}
 
         <div className="absolute inset-0 bg-black/40 z-10 pointer-events-none" />
+
+        {/* Admin floating button to customize/remove hero background */}
+        <div className="absolute top-28 right-6 md:right-10 z-30">
+          <button
+            onClick={() => {
+              setHeroBgUrlInput(settings.hero_bg_url || '');
+              setHeroBgTypeInput((settings.hero_bg_type as any) || 'video');
+              setIsHeroEditOpen(true);
+            }}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-black/75 hover:bg-black text-white border border-white/25 hover:border-white/50 backdrop-blur-xl shadow-2xl transition-all duration-300 text-xs font-bold tracking-wider uppercase cursor-pointer hover:scale-105 active:scale-95"
+            title="Update Hero Background Video/Image"
+          >
+            <Edit3 size={14} className="text-amber-400" />
+            <span>Customize Hero BG</span>
+          </button>
+        </div>
 
         <div className="max-w-7xl mx-auto relative z-20 flex flex-col items-center text-center">
           <div className="space-y-12 w-full">
@@ -1479,59 +1598,6 @@ export default function AdminPage() {
       {/* Marquee component */}
       <Marquee />
 
-      {/* About Section */}
-      <section id="about" className="py-32 px-6 lg:px-8 border-t border-black/5 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-24">
-            <div className="space-y-12">
-              <h2 className="text-2xl font-joyride font-normal tracking-wide text-black uppercase flex items-center gap-4">
-                <span className="text-sm px-3.5 py-1 font-bold font-sans bg-black text-white rounded-full">05</span>
-                ABOUT
-              </h2>
-              <div className="space-y-8 text-neutral-800 text-lg md:text-xl font-light leading-relaxed">
-                <p>
-                  I'm Kshitij Rathore, a visual artist, filmmaker, and post-production specialist with over 7 years of experience crafting high-impact commercials, music videos, and cinematic promos.
-                </p>
-                <p>
-                  My work lives at the intersection of raw emotion and surgical precision. From high-energy brand campaigns to moody narrative pieces, I approach every frame with obsessive attention to color, pacing, and visual story.
-                </p>
-                <p>
-                  Over the years, I've had the privilege of collaborating with top brands including Netflix, Amazon Prime Video, Disney+ Hotstar, Swiggy, and CRED, working alongside legendary talents and cutting-edge creators across India.
-                </p>
-              </div>
-
-              <div className="pt-8 border-t border-black/10 grid grid-cols-2 sm:grid-cols-3 gap-8">
-                <div>
-                  <h4 className="text-3xl font-light tracking-tight text-black mb-1">7+</h4>
-                  <p className="text-xs uppercase tracking-widest text-neutral-500 font-bold">Years Experience</p>
-                </div>
-                <div>
-                  <h4 className="text-3xl font-light tracking-tight text-black mb-1">100+</h4>
-                  <p className="text-xs uppercase tracking-widest text-neutral-500 font-bold">Projects Delivered</p>
-                </div>
-                <div>
-                  <h4 className="text-3xl font-light tracking-tight text-black mb-1">50M+</h4>
-                  <p className="text-xs uppercase tracking-widest text-neutral-500 font-bold">Views Generated</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="relative">
-              <div className="aspect-[4/5] bg-neutral-100 overflow-hidden rounded-2xl relative shadow-2xl">
-                <ImageWithFallback
-                  src="/kshitiz-portrait.jpg"
-                  alt="Kshitij Rathore Portrait"
-                  className="w-full h-full object-cover object-[center_15%] grayscale hover:grayscale-0 transition-all duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-8">
-                  <p className="text-white text-xs uppercase tracking-[0.25em] font-bold">Mumbai &bull; Available Worldwide</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <Footer />
 
       {/* Video Modal Player */}
@@ -1555,6 +1621,150 @@ export default function AdminPage() {
           type={toast.type}
           onClose={() => setToast(null)}
         />
+      )}
+
+      {/* Hero Background Customize Modal */}
+      {isHeroEditOpen && (
+        <div
+          className="fixed inset-0 z-[120] bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200"
+          onClick={() => setIsHeroEditOpen(false)}
+        >
+          <div
+            className="w-full max-w-lg bg-[#141416] border border-white/15 rounded-2xl p-6 shadow-2xl relative"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-6">
+              <div>
+                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                  <Film size={18} className="text-amber-400" />
+                  Hero Section Background
+                </h3>
+                <p className="text-xs text-white/50 mt-1">Upload a video or image, paste a link, or remove it.</p>
+              </div>
+              <button
+                onClick={() => setIsHeroEditOpen(false)}
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white flex items-center justify-center transition-colors"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="space-y-5">
+              {/* Type selector */}
+              <div>
+                <label className="text-xs uppercase font-bold tracking-widest text-white/60 block mb-2">Background Type</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {(['video', 'image', 'none'] as const).map(t => (
+                    <button
+                      key={t}
+                      type="button"
+                      onClick={() => setHeroBgTypeInput(t)}
+                      className={`py-2 px-3 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                        heroBgTypeInput === t
+                          ? 'bg-white text-black shadow-lg scale-102'
+                          : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white'
+                      }`}
+                    >
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {heroBgTypeInput !== 'none' && (
+                <>
+                  {/* Upload button */}
+                  <div>
+                    <label className="text-xs uppercase font-bold tracking-widest text-white/60 block mb-2">Upload File</label>
+                    <input
+                      type="file"
+                      ref={heroFileInputRef}
+                      onChange={handleHeroFileUpload}
+                      accept={heroBgTypeInput === 'video' ? 'video/*' : 'image/*'}
+                      className="hidden"
+                    />
+                    <button
+                      type="button"
+                      disabled={heroUploading}
+                      onClick={() => heroFileInputRef.current?.click()}
+                      className="w-full py-4 border-2 border-dashed border-white/20 hover:border-white/50 rounded-xl bg-white/[0.02] hover:bg-white/[0.05] transition-all flex flex-col items-center justify-center gap-2 text-white/80 hover:text-white cursor-pointer"
+                    >
+                      {heroUploading ? (
+                        <div className="flex items-center gap-2">
+                          <RefreshCw size={18} className="animate-spin text-amber-400" />
+                          <span className="text-xs font-bold uppercase tracking-wider">Uploading to CDN...</span>
+                        </div>
+                      ) : (
+                        <>
+                          <Upload size={22} className="text-white/60" />
+                          <span className="text-xs font-bold uppercase tracking-wider">
+                            Choose {heroBgTypeInput === 'video' ? 'Video (.mp4, .webm)' : 'Image (.jpg, .png, .webp)'}
+                          </span>
+                          <span className="text-[10px] text-white/40">Uploaded directly to CDN & optimized</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Or enter direct URL */}
+                  <div>
+                    <label className="text-xs uppercase font-bold tracking-widest text-white/60 block mb-2">Or Direct Media URL</label>
+                    <input
+                      type="url"
+                      value={heroBgUrlInput}
+                      onChange={e => setHeroBgUrlInput(e.target.value)}
+                      placeholder="https://... (.mp4, .jpg, .webp, or CDN link)"
+                      className="w-full px-4 py-2.5 bg-black/50 border border-white/15 focus:border-white/40 rounded-lg text-sm text-white placeholder-white/30 outline-none"
+                    />
+                  </div>
+
+                  {/* Preview */}
+                  {heroBgUrlInput && (
+                    <div className="rounded-xl overflow-hidden border border-white/10 bg-black aspect-video relative">
+                      {heroBgTypeInput === 'video' ? (
+                        <video src={heroBgUrlInput} autoPlay loop muted playsInline className="w-full h-full object-cover" />
+                      ) : (
+                        <img src={heroBgUrlInput} alt="Preview" className="w-full h-full object-cover" />
+                      )}
+                      <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/60 backdrop-blur-md text-[10px] font-bold text-white uppercase tracking-wider">
+                        Live Preview
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {/* Action buttons */}
+              <div className="flex items-center justify-between pt-4 border-t border-white/10 mt-6 gap-3">
+                <button
+                  type="button"
+                  onClick={handleRemoveHeroBg}
+                  className="px-4 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer flex items-center gap-1.5"
+                >
+                  <Trash2 size={14} />
+                  <span>Remove BG</span>
+                </button>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsHeroEditOpen(false)}
+                    className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/15 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSaveHeroSettings}
+                    className="px-5 py-2 rounded-lg bg-white hover:bg-neutral-200 text-black text-xs font-bold uppercase tracking-wider transition-all cursor-pointer shadow-lg active:scale-95"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

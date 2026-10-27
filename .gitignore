@@ -143,3 +143,17 @@ dist
 
 # End of https://www.toptal.com/developers/gitignore/api/node
 .neon
+temp_videos/
+*.mp4
+*.part
+*.bin
+batch-fix-mux.mjs
+batch_migrator.py
+create-settings-table.mjs
+find-drive-ids.mjs
+sync-to-neon.mjs
+test-stream-download.mjs
+test_chunk.py
+test_drive.py
+update-138.mjs
+upload_one_mux.mjs

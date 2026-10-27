@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import authRoutes from './routes/auth.js';
 import worksRoutes from './routes/works.js';
+import settingsRoutes from './routes/settings.js';
 import { db } from './db/index.js';
 import { works } from './db/schema.js';
 import { sql } from 'drizzle-orm';
@@ -60,6 +61,7 @@ app.get('/', (_req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/works', worksRoutes);
+app.use('/api/settings', settingsRoutes);
 
 // Health check
 app.get('/api/health', (_req, res) => {
