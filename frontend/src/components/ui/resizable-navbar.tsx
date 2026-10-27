@@ -104,7 +104,7 @@ export const NavBody = ({ children, className, visible }: NavBodyProps) => {
       }}
       className={cn(
         "relative z-[60] mx-auto hidden w-full max-w-7xl flex-row items-center justify-between self-start rounded-full bg-transparent px-6 py-3 lg:flex dark:bg-transparent transition-colors duration-300",
-        visible ? "bg-white/80 dark:bg-neutral-950/80" : "bg-transparent",
+        visible ? "bg-black/85 border border-white/15 backdrop-blur-md shadow-2xl dark:bg-neutral-950/90" : "bg-transparent",
         className,
       )}
     >
@@ -128,7 +128,7 @@ export const NavItems = ({ items, className, onItemClick, visible }: NavItemsPro
       onMouseLeave={() => setHovered(null)}
       className={cn(
         "absolute inset-0 hidden flex-1 flex-row items-center justify-center space-x-2 text-sm font-medium transition duration-200 lg:flex lg:space-x-2",
-        visible ? "text-zinc-600 hover:text-zinc-800" : "text-zinc-300 hover:text-white",
+        "text-white/80 hover:text-white",
         className,
       )}
     >
@@ -138,7 +138,7 @@ export const NavItems = ({ items, className, onItemClick, visible }: NavItemsPro
           onClick={onItemClick}
           className={cn(
             "relative px-4 py-2 transition-colors duration-200 font-bold uppercase tracking-widest text-xs",
-            visible ? "text-neutral-600 dark:text-neutral-300" : "text-white/80 hover:text-white"
+            "text-white/80 hover:text-white"
           )}
           key={`link-${idx}`}
           href={item.link}
@@ -148,7 +148,7 @@ export const NavItems = ({ items, className, onItemClick, visible }: NavItemsPro
               layoutId="hovered"
               className={cn(
                 "absolute inset-0 h-full w-full rounded-full",
-                visible ? "bg-gray-100 dark:bg-neutral-800" : "bg-white/10"
+                "bg-white/15"
               )}
             />
           )}
@@ -180,7 +180,7 @@ export const MobileNav = ({ children, className, visible }: MobileNavProps) => {
       }}
       className={cn(
         "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between bg-transparent px-4 py-3 lg:hidden transition-colors duration-300",
-        visible ? "bg-white/80 dark:bg-neutral-950/80" : "bg-transparent",
+        visible ? "bg-black/90 border border-white/15 backdrop-blur-md dark:bg-neutral-950/90" : "bg-transparent",
         className,
       )}
     >
@@ -259,7 +259,7 @@ export const MobileNavToggle = ({
   ) : (
     <Menu className={cn(
       "cursor-pointer transition-colors duration-300",
-      visible ? "text-black dark:text-white" : "text-white"
+      "text-white"
     )} onClick={onClick} />
   );
 };
