@@ -269,14 +269,46 @@ function WorkModal({
           </div>
 
           <div>
-            <label className="block text-xs uppercase tracking-widest text-white/60 mb-2 font-medium">Tags (comma separated)</label>
-            <input
-              type="text"
-              value={tags}
-              onChange={e => setTags(e.target.value)}
-              placeholder="EDITOR, COLORIST, DOP, MOTION"
-              className="w-full bg-white/5 border border-white/15 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/30 transition-all"
-            />
+            <label className="block text-xs uppercase tracking-widest text-white/60 mb-2.5 font-medium">
+              Select Tags <span className="text-white/40 normal-case">(choose one or more)</span>
+            </label>
+            <div className="flex flex-wrap gap-2.5">
+              {['EDITOR', 'COLORIST', 'DOP', 'MOTION'].map(tagOption => {
+                const currentTags = tags
+                  .split(',')
+                  .map(t => t.trim().toUpperCase())
+                  .filter(Boolean);
+                const isSelected = currentTags.includes(tagOption);
+
+                return (
+                  <button
+                    key={tagOption}
+                    type="button"
+                    onClick={() => {
+                      let updated;
+                      if (isSelected) {
+                        updated = currentTags.filter(t => t !== tagOption);
+                      } else {
+                        updated = [...currentTags, tagOption];
+                      }
+                      setTags(updated.join(', '));
+                    }}
+                    className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer flex items-center gap-1.5 btn-tactile ${
+                      isSelected
+                        ? 'bg-amber-400 text-black shadow-[0_0_15px_rgba(251,191,36,0.35)] scale-105'
+                        : 'bg-white/5 text-white/70 border border-white/15 hover:bg-white/10 hover:text-white'
+                    }`}
+                  >
+                    <span>{tagOption}</span>
+                    {isSelected && <span className="text-black font-extrabold text-[11px]">✓</span>}
+                  </button>
+                );
+              })}
+            </div>
+            {/* Display formatted preview */}
+            <div className="mt-2 text-[11px] text-white/40 font-mono tracking-wide">
+              Selected: <span className="text-amber-300 font-semibold">{tags || 'None (select at least one tag)'}</span>
+            </div>
           </div>
 
           <div>
