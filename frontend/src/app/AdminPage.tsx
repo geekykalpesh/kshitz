@@ -1428,8 +1428,8 @@ export default function AdminPage() {
       </section>
 
       {/* ─── 01 Recent (Featured Works Carousel) ─── */}
-      <section id="works" className="py-20 bg-black border-t border-white/10">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between mb-12">
+      <section id="works" className="pt-14 pb-10 bg-black border-t border-white/10">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between mb-8">
           <h2 className="text-2xl font-joyride font-normal tracking-wide text-white uppercase flex items-center gap-4">
             <span className="text-sm px-3.5 py-1 font-bold font-sans bg-white text-black rounded-full">01</span>
             Recent
@@ -1470,9 +1470,9 @@ export default function AdminPage() {
       </section>
 
       {/* ─── 02 All Works (Grid with Filter & Drag) ─── */}
-      <section id="archive" className="py-20 bg-black border-t border-white/10">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-8">
+      <section id="archive" className="pt-14 pb-10 bg-black border-t border-white/10 w-full">
+        <div className="w-full">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8 flex flex-col md:flex-row md:items-center justify-between mb-8 gap-6">
             <h2 className="text-2xl font-joyride font-normal tracking-wide text-white uppercase flex items-center gap-4">
               <span className="text-sm px-3.5 py-1 font-bold font-sans bg-white text-black rounded-full">02</span>
               All
@@ -1506,10 +1506,10 @@ export default function AdminPage() {
                 ))}
               </div>
               {filteredWorkItems.length > colsCreative * 3 && (
-                <div className="flex justify-center mt-16">
+                <div className="flex justify-center mt-8">
                   <button
                     onClick={() => { setCurrentPage('creative-archive'); window.scrollTo({ top: 0, behavior: 'instant' }); }}
-                    className="px-12 py-5 border border-white/25 text-[11px] font-bold uppercase tracking-[0.2em] text-white hover:bg-white hover:text-black transition-all duration-300 rounded-full cursor-pointer btn-tactile hover:shadow-lg"
+                    className="px-8 py-3.5 border border-white/25 text-[10px] font-bold uppercase tracking-[0.2em] text-white hover:bg-white hover:text-black transition-all duration-300 rounded-full cursor-pointer btn-tactile hover:shadow-lg"
                   >
                     See More
                   </button>
@@ -1525,12 +1525,14 @@ export default function AdminPage() {
       </section>
 
       {/* ─── 03 Vertical Works ─── */}
-      <section id="verticals" className="py-20 bg-black border-t border-white/10">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="mb-12 text-2xl font-joyride font-normal tracking-wide text-white uppercase flex items-center gap-4">
-            <span className="text-sm px-3.5 py-1 font-bold font-sans bg-white text-black rounded-full">03</span>
-            VERTICAL
-          </h2>
+      <section id="verticals" className="pt-14 pb-10 bg-black border-t border-white/10 w-full">
+        <div className="w-full">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8 mb-8">
+            <h2 className="text-2xl font-joyride font-normal tracking-wide text-white uppercase flex items-center gap-4">
+              <span className="text-sm px-3.5 py-1 font-bold font-sans bg-white text-black rounded-full">03</span>
+              VERTICAL
+            </h2>
+          </div>
 
           {loading ? (
             <ShimmerGrid count={5} aspect="vertical" cols={5} />
@@ -1542,10 +1544,10 @@ export default function AdminPage() {
                 ))}
               </div>
               {filteredVerticalVideos.length > colsPortrait * 2 && (
-                <div className="flex justify-center mt-16">
+                <div className="flex justify-center mt-8">
                   <button
                     onClick={() => { setCurrentPage('portrait-cinema'); window.scrollTo({ top: 0, behavior: 'instant' }); }}
-                    className="px-12 py-5 border border-white/25 text-[11px] font-bold uppercase tracking-[0.2em] text-white hover:bg-white hover:text-black transition-all duration-300 rounded-full cursor-pointer btn-tactile hover:shadow-lg"
+                    className="px-8 py-3.5 border border-white/25 text-[10px] font-bold uppercase tracking-[0.2em] text-white hover:bg-white hover:text-black transition-all duration-300 rounded-full cursor-pointer btn-tactile hover:shadow-lg"
                   >
                     See More
                   </button>
@@ -1561,12 +1563,14 @@ export default function AdminPage() {
       </section>
 
       {/* ─── 04 Cinematography Works ─── */}
-      <section id="cinematography" className="py-20 bg-black border-t border-white/10">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="mb-12 text-2xl font-joyride font-normal tracking-wide text-white uppercase flex items-center gap-4">
-            <span className="text-sm px-3.5 py-1 font-bold font-sans bg-white text-black rounded-full">04</span>
-            CINEMATOGRAPHY
-          </h2>
+      <section id="cinematography" className="pt-14 pb-10 bg-black border-t border-white/10 w-full">
+        <div className="w-full">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8 mb-8">
+            <h2 className="text-2xl font-joyride font-normal tracking-wide text-white uppercase flex items-center gap-4">
+              <span className="text-sm px-3.5 py-1 font-bold font-sans bg-white text-black rounded-full">04</span>
+              CINEMATOGRAPHY
+            </h2>
+          </div>
 
           {loading ? (
             <ShimmerGrid count={3} aspect="video" cols={3} />
@@ -1578,10 +1582,10 @@ export default function AdminPage() {
                 ))}
               </div>
               {cinematographyWorks.length > colsCreative * 3 && (
-                <div className="flex justify-center mt-16">
+                <div className="flex justify-center mt-8">
                   <button
                     onClick={() => { setCurrentPage('cinematography'); window.scrollTo({ top: 0, behavior: 'instant' }); }}
-                    className="px-12 py-5 border border-white/25 text-[11px] font-bold uppercase tracking-[0.2em] text-white hover:bg-white hover:text-black transition-all duration-300 rounded-full cursor-pointer btn-tactile hover:shadow-lg"
+                    className="px-8 py-3.5 border border-white/25 text-[10px] font-bold uppercase tracking-[0.2em] text-white hover:bg-white hover:text-black transition-all duration-300 rounded-full cursor-pointer btn-tactile hover:shadow-lg"
                   >
                     See More
                   </button>
