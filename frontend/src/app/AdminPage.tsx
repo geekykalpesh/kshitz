@@ -729,6 +729,7 @@ export default function AdminPage() {
     if (!url) return false;
     const lowerUrl = url.toLowerCase();
     return (
+      lowerUrl.includes('imagekit.io') ||
       lowerUrl.includes('mux.com') ||
       lowerUrl.includes('.m3u8') ||
       lowerUrl.startsWith('/uploads/') ||

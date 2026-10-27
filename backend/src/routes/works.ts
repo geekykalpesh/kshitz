@@ -192,7 +192,7 @@ router.get('/imagekit-auth', authenticateToken, (_req: AuthenticatedRequest, res
   }
 });
 
-// POST /api/works/upload - Admin: Upload file (Images go directly to ImageKit, Videos to local/Mux or ImageKit)
+// POST /api/works/upload - Admin: Upload file (Images and Videos go directly to ImageKit CDN)
 router.post('/upload', authenticateToken, upload.single('file'), async (req: AuthenticatedRequest, res: Response) => {
   try {
     if (!req.file) {
@@ -225,68 +225,33 @@ router.post('/upload', authenticateToken, upload.single('file'), async (req: Aut
         });
         return;
       } catch (ikError) {
-        console.error('ImageKit upload error, falling back to local storage:', ikError);
+        console.error('ImageKit image upload error, falling back to local storage:', ikError);
       }
     }
 
-    // Upload videos directly to Mux Video
-    if (isVideo && process.env.MUX_TOKEN_ID && process.env.MUX_TOKEN_SECRET) {
+    // Upload videos directly to ImageKit Video CDN (100% free, unlimited assets)
+    if (isVideo) {
       try {
-        const MuxModule = await import('@mux/mux-node');
-        const MuxClient = MuxModule.default || MuxModule;
-        const mux = new (MuxClient as any)({
-          tokenId: process.env.MUX_TOKEN_ID,
-          tokenSecret: process.env.MUX_TOKEN_SECRET,
+        const fileBuffer = fs.readFileSync(req.file.path);
+        const ikResponse = await imagekit.upload({
+          file: fileBuffer,
+          fileName: req.file.filename,
+          folder: '/portfolio/videos',
+          useUniqueFileName: true,
         });
 
-        // Create direct upload in Mux
-        const upload = await mux.video.uploads.create({
-          new_asset_settings: {
-            playback_policy: ['public'],
-          },
-          cors_origin: '*',
+        try { fs.unlinkSync(req.file.path); } catch (e) {}
+
+        res.json({
+          url: ikResponse.url,
+          filename: ikResponse.name,
+          fileId: ikResponse.fileId,
+          thumbnailUrl: ikResponse.thumbnailUrl || ikResponse.url,
+          provider: 'imagekit',
         });
-
-        const fileStream = fs.createReadStream(req.file.path);
-        const stats = fs.statSync(req.file.path);
-
-        const uploadRes = await fetch(upload.url, {
-          method: 'PUT',
-          headers: { 'Content-Length': String(stats.size) },
-          body: fileStream as any,
-          duplex: 'half',
-        } as any);
-
-        if (uploadRes.ok) {
-          // Poll until ready
-          let assetId: string | undefined;
-          for (let attempt = 0; attempt < 25; attempt++) {
-            await new Promise(r => setTimeout(r, 2000));
-            const uploadStatus = await mux.video.uploads.retrieve(upload.id);
-            if (uploadStatus.asset_id) {
-              assetId = uploadStatus.asset_id;
-              break;
-            }
-          }
-
-          if (assetId) {
-            const asset = await mux.video.assets.retrieve(assetId);
-            const playbackId = asset.playback_ids?.[0]?.id;
-            if (playbackId) {
-              try { fs.unlinkSync(req.file.path); } catch (e) {}
-              const streamUrl = `https://stream.mux.com/${playbackId}.m3u8`;
-              res.json({
-                url: streamUrl,
-                playbackId,
-                filename: req.file.filename,
-                provider: 'mux',
-              });
-              return;
-            }
-          }
-        }
-      } catch (muxError) {
-        console.error('Mux upload error, falling back to local storage:', muxError);
+        return;
+      } catch (ikError) {
+        console.error('ImageKit video upload error, falling back to local storage:', ikError);
       }
     }
 
