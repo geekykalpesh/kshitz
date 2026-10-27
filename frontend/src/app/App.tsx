@@ -737,9 +737,9 @@ export default function App() {
       </section>
 
       {/* ─── 02 All Works (Grid with Filter) ─── */}
-      <section id="archive" className="py-20 px-6 lg:px-8 border-t border-black/5">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-8">
+      <section id="archive" className="py-20 border-t border-black/5 w-full">
+        <div className="w-full">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8 flex flex-col md:flex-row md:items-center justify-between mb-12 gap-8">
             <h2 className="text-2xl font-joyride font-normal tracking-wide text-black uppercase flex items-center gap-4">
               <span className="text-sm px-3.5 py-1 font-bold font-sans bg-black text-white rounded-full">02</span>
               All
@@ -803,12 +803,14 @@ export default function App() {
       </section>
 
       {/* ─── 03 Vertical Works ─── */}
-      <section id="verticals" className="py-20 px-6 lg:px-8 bg-neutral-50 border-t border-black/5">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="mb-12 text-2xl font-joyride font-normal tracking-wide text-black uppercase flex items-center gap-4">
-            <span className="text-sm px-3.5 py-1 font-bold font-sans bg-black text-white rounded-full">03</span>
-            VERTICAL
-          </h2>
+      <section id="verticals" className="py-20 bg-neutral-50 border-t border-black/5 w-full">
+        <div className="w-full">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8 mb-12">
+            <h2 className="text-2xl font-joyride font-normal tracking-wide text-black uppercase flex items-center gap-4">
+              <span className="text-sm px-3.5 py-1 font-bold font-sans bg-black text-white rounded-full">03</span>
+              VERTICAL
+            </h2>
+          </div>
 
           {loading ? (
             <ShimmerGrid count={5} aspect="vertical" cols={5} />
@@ -855,12 +857,14 @@ export default function App() {
       </section>
 
       {/* ─── 04 Cinematography Works ─── */}
-      <section id="cinematography" className="py-20 px-6 lg:px-8 bg-white border-t border-black/5">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="mb-12 text-2xl font-joyride font-normal tracking-wide text-black uppercase flex items-center gap-4">
-            <span className="text-sm px-3.5 py-1 font-bold font-sans bg-black text-white rounded-full">04</span>
-            CINEMATOGRAPHY
-          </h2>
+      <section id="cinematography" className="py-20 bg-white border-t border-black/5 w-full">
+        <div className="w-full">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8 mb-12">
+            <h2 className="text-2xl font-joyride font-normal tracking-wide text-black uppercase flex items-center gap-4">
+              <span className="text-sm px-3.5 py-1 font-bold font-sans bg-black text-white rounded-full">04</span>
+              CINEMATOGRAPHY
+            </h2>
+          </div>
 
           {loading ? (
             <ShimmerGrid count={3} aspect="video" cols={3} />
