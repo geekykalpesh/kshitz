@@ -351,7 +351,7 @@ export default function App() {
                 ))}
               </div>
               {filteredWorkItems.length > visibleCreative && (
-                <div className="flex justify-center mt-16">
+                <div className="flex justify-center mt-8">
                   <button
                     onClick={() => setVisibleCreative(prev => prev + 18)}
                     className="px-8 py-3.5 bg-black text-white rounded-full text-xs font-bold uppercase tracking-widest hover:bg-neutral-800 transition-all cursor-pointer btn-tactile shadow-lg"
@@ -439,7 +439,7 @@ export default function App() {
                 ))}
               </div>
               {filteredVerticalVideos.length > visibleVerticals && (
-                <div className="flex justify-center mt-16">
+                <div className="flex justify-center mt-8">
                   <button
                     onClick={() => setVisibleVerticals(prev => prev + 20)}
                     className="px-8 py-3.5 bg-black text-white rounded-full text-xs font-bold uppercase tracking-widest hover:bg-neutral-800 transition-all cursor-pointer btn-tactile shadow-lg"
@@ -528,7 +528,7 @@ export default function App() {
                 ))}
               </div>
               {filteredCinematographyWorks.length > visibleCinematography && (
-                <div className="flex justify-center mt-16">
+                <div className="flex justify-center mt-8">
                   <button
                     onClick={() => setVisibleCinematography(prev => prev + 18)}
                     className="px-8 py-3.5 bg-black text-white rounded-full text-xs font-bold uppercase tracking-widest hover:bg-neutral-800 transition-all cursor-pointer btn-tactile shadow-lg"
@@ -678,8 +678,8 @@ export default function App() {
       </section>
 
       {/* ─── 01 Recent (Featured Works Carousel) ─── */}
-      <section id="works" className="py-20 bg-neutral-50">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between mb-12">
+      <section id="works" className="pt-14 pb-10 bg-neutral-50 border-t border-black/5">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between mb-8">
           <h2 className="text-2xl font-joyride font-normal tracking-wide text-black uppercase flex items-center gap-4">
             <span className="text-sm px-3.5 py-1 font-bold font-sans bg-black text-white rounded-full">01</span>
             Recent
@@ -737,9 +737,9 @@ export default function App() {
       </section>
 
       {/* ─── 02 All Works (Grid with Filter) ─── */}
-      <section id="archive" className="py-20 border-t border-black/5 w-full">
+      <section id="archive" className="pt-14 pb-10 border-t border-black/5 w-full bg-white">
         <div className="w-full">
-          <div className="max-w-7xl mx-auto px-6 lg:px-8 flex flex-col md:flex-row md:items-center justify-between mb-12 gap-8">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8 flex flex-col md:flex-row md:items-center justify-between mb-8 gap-6">
             <h2 className="text-2xl font-joyride font-normal tracking-wide text-black uppercase flex items-center gap-4">
               <span className="text-sm px-3.5 py-1 font-bold font-sans bg-black text-white rounded-full">02</span>
               All
@@ -786,9 +786,9 @@ export default function App() {
                 ))}
               </div>
               {filteredWorkItems.length > colsCreative * 3 && (
-                <div className="flex justify-center mt-16">
+                <div className="flex justify-center mt-8">
                   <button onClick={() => { setCurrentPage('creative-archive'); window.scrollTo({ top: 0, behavior: 'instant' }); }}
-                    className="px-12 py-5 border border-black text-[11px] font-bold uppercase tracking-[0.2em] text-black hover:bg-black hover:text-white transition-all duration-300 rounded-full cursor-pointer btn-tactile hover:shadow-lg">
+                    className="px-8 py-3.5 border border-black text-[10px] font-bold uppercase tracking-[0.2em] text-black hover:bg-black hover:text-white transition-all duration-300 rounded-full cursor-pointer btn-tactile hover:shadow-lg">
                     See More
                   </button>
                 </div>
@@ -803,9 +803,9 @@ export default function App() {
       </section>
 
       {/* ─── 03 Vertical Works ─── */}
-      <section id="verticals" className="py-20 bg-neutral-50 border-t border-black/5 w-full">
+      <section id="verticals" className="pt-14 pb-10 bg-neutral-50 border-t border-black/5 w-full">
         <div className="w-full">
-          <div className="max-w-7xl mx-auto px-6 lg:px-8 mb-12">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8 mb-8">
             <h2 className="text-2xl font-joyride font-normal tracking-wide text-black uppercase flex items-center gap-4">
               <span className="text-sm px-3.5 py-1 font-bold font-sans bg-black text-white rounded-full">03</span>
               VERTICAL
@@ -840,9 +840,9 @@ export default function App() {
                 ))}
               </div>
               {filteredVerticalVideos.length > colsPortrait * 2 && (
-                <div className="flex justify-center mt-16">
+                <div className="flex justify-center mt-8">
                   <button onClick={() => { setCurrentPage('portrait-cinema'); window.scrollTo({ top: 0, behavior: 'instant' }); }}
-                    className="px-12 py-5 border border-black text-[11px] font-bold uppercase tracking-[0.2em] text-black hover:bg-black hover:text-white transition-all duration-300 rounded-full cursor-pointer btn-tactile hover:shadow-lg">
+                    className="px-8 py-3.5 border border-black text-[10px] font-bold uppercase tracking-[0.2em] text-black hover:bg-black hover:text-white transition-all duration-300 rounded-full cursor-pointer btn-tactile hover:shadow-lg">
                     See More
                   </button>
                 </div>
@@ -857,9 +857,9 @@ export default function App() {
       </section>
 
       {/* ─── 04 Cinematography Works ─── */}
-      <section id="cinematography" className="py-20 bg-white border-t border-black/5 w-full">
+      <section id="cinematography" className="pt-14 pb-10 bg-white border-t border-black/5 w-full">
         <div className="w-full">
-          <div className="max-w-7xl mx-auto px-6 lg:px-8 mb-12">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8 mb-8">
             <h2 className="text-2xl font-joyride font-normal tracking-wide text-black uppercase flex items-center gap-4">
               <span className="text-sm px-3.5 py-1 font-bold font-sans bg-black text-white rounded-full">04</span>
               CINEMATOGRAPHY
@@ -894,9 +894,9 @@ export default function App() {
                 ))}
               </div>
               {cinematographyWorks.length > colsCreative * 3 && (
-                <div className="flex justify-center mt-16">
+                <div className="flex justify-center mt-8">
                   <button onClick={() => { setCurrentPage('cinematography'); window.scrollTo({ top: 0, behavior: 'instant' }); }}
-                    className="px-12 py-5 border border-black text-[11px] font-bold uppercase tracking-[0.2em] text-black hover:bg-black hover:text-white transition-all duration-300 rounded-full cursor-pointer btn-tactile hover:shadow-lg">
+                    className="px-8 py-3.5 border border-black text-[10px] font-bold uppercase tracking-[0.2em] text-black hover:bg-black hover:text-white transition-all duration-300 rounded-full cursor-pointer btn-tactile hover:shadow-lg">
                     See More
                   </button>
                 </div>
