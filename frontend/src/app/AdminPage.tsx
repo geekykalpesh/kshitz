@@ -1394,14 +1394,14 @@ export default function AdminPage() {
               >
                 <p className="uppercase tracking-[0.35em] text-[10px] font-bold text-white leading-none flex items-center gap-2.5">
                   <Film size={13} className="text-white animate-pulse" />
-                  DOP &bull; Editor &bull; Colorist
+                  {settings.hero_badge || "DOP • Editor • Colorist"}
                 </p>
               </motion.div>
             </div>
             <div className="space-y-4 -mt-4 md:-mt-8">
               <div className="flex flex-col items-center">
                 <div className="flex overflow-hidden pb-0">
-                  {"KSHITIJ".split("").map((char, i) => (
+                  {(settings.hero_title_first || "KSHITIJ").split("").map((char, i) => (
                     <motion.span key={i}
                       initial={{ opacity: 0, filter: "blur(10px)", y: 20, scale: 0.8 }}
                       animate={{ opacity: 1, filter: "blur(0px)", y: 0, scale: 1 }}
@@ -1413,7 +1413,7 @@ export default function AdminPage() {
                   ))}
                 </div>
                 <div className="flex overflow-hidden -mt-2 md:-mt-5">
-                  {"RATHORE".split("").map((char, i) => (
+                  {(settings.hero_title_last || "RATHORE").split("").map((char, i) => (
                     <motion.span key={i}
                       initial={{ opacity: 0, filter: "blur(10px)", y: 20, scale: 0.8 }}
                       animate={{ opacity: 1, filter: "blur(0px)", y: 0, scale: 1 }}
@@ -1436,10 +1436,9 @@ export default function AdminPage() {
               <motion.p
                 animate={{ y: [0, -5, 0] }}
                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                className="text-xl md:text-3xl font-light text-white/90 leading-tight tracking-tight px-4"
+                className="text-xl md:text-3xl font-light text-white/90 leading-tight tracking-tight px-4 whitespace-pre-line"
               >
-                I shoot stories, shape rhythms, and paint with color. <br className="hidden md:block" />
-                The rest is just export settings.
+                {settings.hero_subtitle || 'I shoot stories, shape rhythms, and paint with color.\nThe rest is just export settings.'}
               </motion.p>
 
               <div className="flex flex-wrap items-center justify-center gap-6 pt-4">
@@ -1660,144 +1659,248 @@ export default function AdminPage() {
         />
       )}
 
-      {/* Hero Background Customize Modal */}
+      {/* Hero Background & Text Content Customize Modal */}
       {isHeroEditOpen && (
         <div
           className="fixed inset-0 z-[120] bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200"
           onClick={() => setIsHeroEditOpen(false)}
         >
           <div
-            className="w-full max-w-lg bg-[#141416] border border-white/15 rounded-2xl p-6 shadow-2xl relative"
+            className="w-full max-w-xl bg-[#141416] border border-white/15 rounded-2xl p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto"
             onClick={e => e.stopPropagation()}
           >
             <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-6">
               <div>
                 <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                  <Film size={18} className="text-amber-400" />
-                  Hero Section Background
+                  <Edit3 size={18} className="text-amber-400" />
+                  Customize Hero Section
                 </h3>
-                <p className="text-xs text-white/50 mt-1">Upload a video or image, paste a link, or remove it.</p>
+                <p className="text-xs text-white/50 mt-1">Edit headline text, bio description, badge, and background media.</p>
               </div>
               <button
                 onClick={() => setIsHeroEditOpen(false)}
-                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white flex items-center justify-center transition-colors"
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
               >
                 <X size={18} />
               </button>
             </div>
 
-            <div className="space-y-5">
-              {/* Type selector */}
-              <div>
-                <label className="text-xs uppercase font-bold tracking-widest text-white/60 block mb-2">Background Type</label>
-                <div className="grid grid-cols-3 gap-2">
-                  {(['video', 'image', 'none'] as const).map(t => (
-                    <button
-                      key={t}
-                      type="button"
-                      onClick={() => setHeroBgTypeInput(t)}
-                      className={`py-2 px-3 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
-                        heroBgTypeInput === t
-                          ? 'bg-white text-black shadow-lg scale-102'
-                          : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white'
-                      }`}
-                    >
-                      {t}
-                    </button>
-                  ))}
+            {/* Mode Tabs */}
+            <div className="flex border-b border-white/10 mb-6 gap-2">
+              <button
+                type="button"
+                onClick={() => setHeroTab('content')}
+                className={`pb-3 px-4 text-xs font-bold uppercase tracking-widest transition-all cursor-pointer border-b-2 ${
+                  heroTab === 'content'
+                    ? 'border-amber-400 text-amber-300'
+                    : 'border-transparent text-white/50 hover:text-white'
+                }`}
+              >
+                Text Content
+              </button>
+              <button
+                type="button"
+                onClick={() => setHeroTab('background')}
+                className={`pb-3 px-4 text-xs font-bold uppercase tracking-widest transition-all cursor-pointer border-b-2 ${
+                  heroTab === 'background'
+                    ? 'border-amber-400 text-amber-300'
+                    : 'border-transparent text-white/50 hover:text-white'
+                }`}
+              >
+                Background Media
+              </button>
+            </div>
+
+            {heroTab === 'content' && (
+              <div className="space-y-4">
+                {/* Hero Badge */}
+                <div>
+                  <label className="text-xs uppercase font-bold tracking-widest text-white/60 block mb-2">
+                    Hero Top Badge / Roles
+                  </label>
+                  <input
+                    type="text"
+                    value={heroBadgeInput}
+                    onChange={e => setHeroBadgeInput(e.target.value)}
+                    placeholder="e.g. DOP • Editor • Colorist"
+                    className="w-full px-4 py-2.5 bg-black/50 border border-white/15 focus:border-amber-400 focus:ring-1 focus:ring-amber-400/30 rounded-lg text-sm text-white placeholder-white/30 outline-none transition-all"
+                  />
+                  <p className="text-[11px] text-white/40 mt-1">Appears in the glowing pill badge above the hero name.</p>
+                </div>
+
+                {/* Hero Title Line 1 & Line 2 */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs uppercase font-bold tracking-widest text-white/60 block mb-2">
+                      Title Line 1 (First Name)
+                    </label>
+                    <input
+                      type="text"
+                      value={heroTitleFirstInput}
+                      onChange={e => setHeroTitleFirstInput(e.target.value)}
+                      placeholder="e.g. KSHITIJ"
+                      className="w-full px-4 py-2.5 bg-black/50 border border-white/15 focus:border-amber-400 focus:ring-1 focus:ring-amber-400/30 rounded-lg text-sm text-white placeholder-white/30 outline-none transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs uppercase font-bold tracking-widest text-white/60 block mb-2">
+                      Title Line 2 (Last Name)
+                    </label>
+                    <input
+                      type="text"
+                      value={heroTitleLastInput}
+                      onChange={e => setHeroTitleLastInput(e.target.value)}
+                      placeholder="e.g. RATHORE"
+                      className="w-full px-4 py-2.5 bg-black/50 border border-white/15 focus:border-amber-400 focus:ring-1 focus:ring-amber-400/30 rounded-lg text-sm text-white placeholder-white/30 outline-none transition-all"
+                    />
+                  </div>
+                </div>
+
+                {/* Hero Subtitle / Bio */}
+                <div>
+                  <label className="text-xs uppercase font-bold tracking-widest text-white/60 block mb-2">
+                    Hero Subtitle / Bio Statement
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={heroSubtitleInput}
+                    onChange={e => setHeroSubtitleInput(e.target.value)}
+                    placeholder="e.g. I shoot stories, shape rhythms, and paint with color.\nThe rest is just export settings."
+                    className="w-full px-4 py-2.5 bg-black/50 border border-white/15 focus:border-amber-400 focus:ring-1 focus:ring-amber-400/30 rounded-lg text-sm text-white placeholder-white/30 outline-none transition-all resize-y"
+                  />
+                  <p className="text-[11px] text-white/40 mt-1">Press Enter for line breaks. Displayed right below the name.</p>
+                </div>
+
+                {/* Live Text Preview Box */}
+                <div className="p-4 rounded-xl border border-white/10 bg-black/40 space-y-2 mt-4 text-center">
+                  <p className="text-[10px] uppercase tracking-widest text-white/40 font-bold">Instant Preview</p>
+                  <div className="text-xs font-bold uppercase tracking-widest text-white/80">
+                    {heroBadgeInput || 'DOP • Editor • Colorist'}
+                  </div>
+                  <div className="text-2xl font-bold tracking-tight text-white">
+                    {heroTitleFirstInput || 'KSHITIJ'} <span className="text-neutral-400">{heroTitleLastInput || 'RATHORE'}</span>
+                  </div>
+                  <div className="text-xs text-white/70 whitespace-pre-line font-light italic">
+                    "{heroSubtitleInput || 'I shoot stories, shape rhythms, and paint with color.\nThe rest is just export settings.'}"
+                  </div>
                 </div>
               </div>
+            )}
 
-              {heroBgTypeInput !== 'none' && (
-                <>
-                  {/* Upload button */}
-                  <div>
-                    <label className="text-xs uppercase font-bold tracking-widest text-white/60 block mb-2">Upload File</label>
-                    <input
-                      type="file"
-                      ref={heroFileInputRef}
-                      onChange={handleHeroFileUpload}
-                      accept={heroBgTypeInput === 'video' ? 'video/*' : 'image/*'}
-                      className="hidden"
-                    />
-                    <button
-                      type="button"
-                      disabled={heroUploading}
-                      onClick={() => heroFileInputRef.current?.click()}
-                      className="w-full py-4 border-2 border-dashed border-white/20 hover:border-white/50 rounded-xl bg-white/[0.02] hover:bg-white/[0.05] transition-all flex flex-col items-center justify-center gap-2 text-white/80 hover:text-white cursor-pointer"
-                    >
-                      {heroUploading ? (
-                        <div className="flex items-center gap-2">
-                          <RefreshCw size={18} className="animate-spin text-amber-400" />
-                          <span className="text-xs font-bold uppercase tracking-wider">Uploading to CDN...</span>
-                        </div>
-                      ) : (
-                        <>
-                          <Upload size={22} className="text-white/60" />
-                          <span className="text-xs font-bold uppercase tracking-wider">
-                            Choose {heroBgTypeInput === 'video' ? 'Video (.mp4, .webm)' : 'Image (.jpg, .png, .webp)'}
-                          </span>
-                          <span className="text-[10px] text-white/40">Uploaded directly to CDN & optimized</span>
-                        </>
-                      )}
-                    </button>
+            {heroTab === 'background' && (
+              <div className="space-y-5">
+                {/* Type selector */}
+                <div>
+                  <label className="text-xs uppercase font-bold tracking-widest text-white/60 block mb-2">Background Type</label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {(['video', 'image', 'none'] as const).map(t => (
+                      <button
+                        key={t}
+                        type="button"
+                        onClick={() => setHeroBgTypeInput(t)}
+                        className={`py-2 px-3 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                          heroBgTypeInput === t
+                            ? 'bg-white text-black shadow-lg scale-102'
+                            : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white'
+                        }`}
+                      >
+                        {t}
+                      </button>
+                    ))}
                   </div>
+                </div>
 
-                  {/* Or enter direct URL */}
-                  <div>
-                    <label className="text-xs uppercase font-bold tracking-widest text-white/60 block mb-2">Or Direct Media URL</label>
-                    <input
-                      type="url"
-                      value={heroBgUrlInput}
-                      onChange={e => setHeroBgUrlInput(e.target.value)}
-                      placeholder="https://... (.mp4, .jpg, .webp, or CDN link)"
-                      className="w-full px-4 py-2.5 bg-black/50 border border-white/15 focus:border-white/40 rounded-lg text-sm text-white placeholder-white/30 outline-none"
-                    />
-                  </div>
-
-                  {/* Preview */}
-                  {heroBgUrlInput && (
-                    <div className="rounded-xl overflow-hidden border border-white/10 bg-black aspect-video relative">
-                      {heroBgTypeInput === 'video' ? (
-                        <video src={heroBgUrlInput} autoPlay loop muted playsInline className="w-full h-full object-cover" />
-                      ) : (
-                        <img src={heroBgUrlInput} alt="Preview" className="w-full h-full object-cover" />
-                      )}
-                      <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/60 backdrop-blur-md text-[10px] font-bold text-white uppercase tracking-wider">
-                        Live Preview
-                      </div>
+                {heroBgTypeInput !== 'none' && (
+                  <>
+                    {/* Upload button */}
+                    <div>
+                      <label className="text-xs uppercase font-bold tracking-widest text-white/60 block mb-2">Upload File</label>
+                      <input
+                        type="file"
+                        ref={heroFileInputRef}
+                        onChange={handleHeroFileUpload}
+                        accept={heroBgTypeInput === 'video' ? 'video/*' : 'image/*'}
+                        className="hidden"
+                      />
+                      <button
+                        type="button"
+                        disabled={heroUploading}
+                        onClick={() => heroFileInputRef.current?.click()}
+                        className="w-full py-4 border-2 border-dashed border-white/20 hover:border-white/50 rounded-xl bg-white/[0.02] hover:bg-white/[0.05] transition-all flex flex-col items-center justify-center gap-2 text-white/80 hover:text-white cursor-pointer"
+                      >
+                        {heroUploading ? (
+                          <div className="flex items-center gap-2">
+                            <RefreshCw size={18} className="animate-spin text-amber-400" />
+                            <span className="text-xs font-bold uppercase tracking-wider">Uploading to CDN...</span>
+                          </div>
+                        ) : (
+                          <>
+                            <Upload size={22} className="text-white/60" />
+                            <span className="text-xs font-bold uppercase tracking-wider">
+                              Choose {heroBgTypeInput === 'video' ? 'Video (.mp4, .webm)' : 'Image (.jpg, .png, .webp)'}
+                            </span>
+                            <span className="text-[10px] text-white/40">Uploaded directly to CDN & optimized</span>
+                          </>
+                        )}
+                      </button>
                     </div>
-                  )}
-                </>
-              )}
 
-              {/* Action buttons */}
-              <div className="flex items-center justify-between pt-4 border-t border-white/10 mt-6 gap-3">
+                    {/* Or enter direct URL */}
+                    <div>
+                      <label className="text-xs uppercase font-bold tracking-widest text-white/60 block mb-2">Or Direct Media URL</label>
+                      <input
+                        type="url"
+                        value={heroBgUrlInput}
+                        onChange={e => setHeroBgUrlInput(e.target.value)}
+                        placeholder="https://... (.mp4, .jpg, .webp, or CDN link)"
+                        className="w-full px-4 py-2.5 bg-black/50 border border-white/15 focus:border-white/40 rounded-lg text-sm text-white placeholder-white/30 outline-none"
+                      />
+                    </div>
+
+                    {/* Preview */}
+                    {heroBgUrlInput && (
+                      <div className="rounded-xl overflow-hidden border border-white/10 bg-black aspect-video relative">
+                        {heroBgTypeInput === 'video' ? (
+                          <video src={heroBgUrlInput} autoPlay loop muted playsInline className="w-full h-full object-cover" />
+                        ) : (
+                          <img src={heroBgUrlInput} alt="Preview" className="w-full h-full object-cover" />
+                        )}
+                        <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/60 backdrop-blur-md text-[10px] font-bold text-white uppercase tracking-wider">
+                          Live Preview
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+
+            {/* Action buttons */}
+            <div className="flex items-center justify-between pt-4 border-t border-white/10 mt-6 gap-3">
+              <button
+                type="button"
+                onClick={handleRemoveHeroBg}
+                className="px-4 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer flex items-center gap-1.5"
+              >
+                <Trash2 size={14} />
+                <span>Remove BG</span>
+              </button>
+
+              <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={handleRemoveHeroBg}
-                  className="px-4 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer flex items-center gap-1.5"
+                  onClick={() => setIsHeroEditOpen(false)}
+                  className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/15 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
                 >
-                  <Trash2 size={14} />
-                  <span>Remove BG</span>
+                  Cancel
                 </button>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setIsHeroEditOpen(false)}
-                    className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/15 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleSaveHeroSettings}
-                    className="px-5 py-2 rounded-lg bg-white hover:bg-neutral-200 text-black text-xs font-bold uppercase tracking-wider transition-all cursor-pointer shadow-lg active:scale-95"
-                  >
-                    Save Changes
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={handleSaveHeroSettings}
+                  className="px-5 py-2 rounded-lg bg-white hover:bg-neutral-200 text-black text-xs font-bold uppercase tracking-wider transition-all cursor-pointer shadow-lg active:scale-95"
+                >
+                  Save Changes
+                </button>
               </div>
             </div>
           </div>

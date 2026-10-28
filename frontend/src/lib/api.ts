@@ -251,6 +251,10 @@ export function adminLogout() {
 export interface SiteSettings {
   hero_bg_url?: string;
   hero_bg_type?: 'video' | 'image' | 'none';
+  hero_badge?: string;
+  hero_title_first?: string;
+  hero_title_last?: string;
+  hero_subtitle?: string;
   [key: string]: string | undefined;
 }
 
@@ -264,6 +268,10 @@ export async function fetchSettings(): Promise<SiteSettings> {
     return {
       hero_bg_url: 'https://ik.imagekit.io/geekykalpesh/portfolio/hero/hero-bg_oPMA23VnnZ.mp4',
       hero_bg_type: 'video',
+      hero_badge: 'DOP • Editor • Colorist',
+      hero_title_first: 'KSHITIJ',
+      hero_title_last: 'RATHORE',
+      hero_subtitle: 'I shoot stories, shape rhythms, and paint with color.\nThe rest is just export settings.',
     };
   }
 }

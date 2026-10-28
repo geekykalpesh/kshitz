@@ -612,14 +612,14 @@ export default function App() {
               >
                 <p className="uppercase tracking-[0.35em] text-[10px] font-bold text-white leading-none flex items-center gap-2.5">
                   <Film size={13} className="text-white animate-pulse" />
-                  DOP &bull; Editor &bull; Colorist
+                  {settings.hero_badge || "DOP • Editor • Colorist"}
                 </p>
               </motion.div>
             </div>
             <div className="space-y-4 -mt-4 md:-mt-8">
               <div className="flex flex-col items-center">
                 <div className="flex overflow-hidden pb-0">
-                  {"KSHITIJ".split("").map((char, i) => (
+                  {(settings.hero_title_first || "KSHITIJ").split("").map((char, i) => (
                     <motion.span key={i}
                       initial={{ opacity: 0, filter: "blur(10px)", y: 20, scale: 0.8 }}
                       animate={{ opacity: 1, filter: "blur(0px)", y: 0, scale: 1 }}
@@ -631,7 +631,7 @@ export default function App() {
                   ))}
                 </div>
                 <div className="flex overflow-hidden -mt-2 md:-mt-5">
-                  {"RATHORE".split("").map((char, i) => (
+                  {(settings.hero_title_last || "RATHORE").split("").map((char, i) => (
                     <motion.span key={i}
                       initial={{ opacity: 0, filter: "blur(10px)", y: 20, scale: 0.8 }}
                       animate={{ opacity: 1, filter: "blur(0px)", y: 0, scale: 1 }}
@@ -654,10 +654,9 @@ export default function App() {
               <motion.p
                 animate={{ y: [0, -5, 0] }}
                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                className="text-xl md:text-3xl font-light text-white/90 leading-tight tracking-tight px-4"
+                className="text-xl md:text-3xl font-light text-white/90 leading-tight tracking-tight px-4 whitespace-pre-line"
               >
-                I shoot stories, shape rhythms, and paint with color. <br className="hidden md:block" />
-                The rest is just export settings.
+                {settings.hero_subtitle || 'I shoot stories, shape rhythms, and paint with color.\nThe rest is just export settings.'}
               </motion.p>
 
               <div className="flex flex-wrap items-center justify-center gap-6 pt-4">
