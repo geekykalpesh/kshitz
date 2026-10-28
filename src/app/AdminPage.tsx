@@ -451,12 +451,21 @@ export default function AdminPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Hero section background customizer state
+  // Hero section background & content customizer state
   const [settings, setSettings] = useState<SiteSettings>({
     hero_bg_url: 'https://ik.imagekit.io/geekykalpesh/portfolio/hero/hero-bg_oPMA23VnnZ.mp4',
     hero_bg_type: 'video',
+    hero_badge: 'DOP • Editor • Colorist',
+    hero_title_first: 'KSHITIJ',
+    hero_title_last: 'RATHORE',
+    hero_subtitle: 'I shoot stories, shape rhythms, and paint with color.\nThe rest is just export settings.',
   });
   const [isHeroEditOpen, setIsHeroEditOpen] = useState(false);
+  const [heroTab, setHeroTab] = useState<'content' | 'background'>('content');
+  const [heroBadgeInput, setHeroBadgeInput] = useState('DOP • Editor • Colorist');
+  const [heroTitleFirstInput, setHeroTitleFirstInput] = useState('KSHITIJ');
+  const [heroTitleLastInput, setHeroTitleLastInput] = useState('RATHORE');
+  const [heroSubtitleInput, setHeroSubtitleInput] = useState('I shoot stories, shape rhythms, and paint with color.\nThe rest is just export settings.');
   const [heroBgUrlInput, setHeroBgUrlInput] = useState('');
   const [heroBgTypeInput, setHeroBgTypeInput] = useState<'video' | 'image' | 'none'>('video');
   const [heroUploading, setHeroUploading] = useState(false);
@@ -481,6 +490,10 @@ export default function AdminPage() {
         setSettings(s);
         setHeroBgUrlInput(s.hero_bg_url || '');
         setHeroBgTypeInput((s.hero_bg_type as any) || 'video');
+        setHeroBadgeInput(s.hero_badge || 'DOP • Editor • Colorist');
+        setHeroTitleFirstInput(s.hero_title_first || 'KSHITIJ');
+        setHeroTitleLastInput(s.hero_title_last || 'RATHORE');
+        setHeroSubtitleInput(s.hero_subtitle || 'I shoot stories, shape rhythms, and paint with color.\nThe rest is just export settings.');
       }
     } catch (e) {
       console.warn('Failed to load settings:', e);
@@ -532,14 +545,18 @@ export default function AdminPage() {
 
   const handleSaveHeroSettings = async () => {
     try {
-      showToast('Saving hero background settings...', 'info');
-      const newSettings = {
+      showToast('Saving hero section settings...', 'info');
+      const newSettings: Record<string, string> = {
         hero_bg_url: heroBgUrlInput.trim(),
         hero_bg_type: heroBgTypeInput,
+        hero_badge: heroBadgeInput.trim() || 'DOP • Editor • Colorist',
+        hero_title_first: heroTitleFirstInput.trim() || 'KSHITIJ',
+        hero_title_last: heroTitleLastInput.trim() || 'RATHORE',
+        hero_subtitle: heroSubtitleInput.trim() || 'I shoot stories, shape rhythms, and paint with color.\nThe rest is just export settings.',
       };
       await updateSettings(newSettings);
       setSettings(prev => ({ ...prev, ...newSettings }));
-      showToast('Hero background updated!', 'success');
+      showToast('Hero section updated successfully!', 'success');
       setIsHeroEditOpen(false);
     } catch (err: any) {
       showToast('Failed to save hero settings: ' + err.message, 'error');
