@@ -1286,6 +1286,24 @@ export default function AdminPage() {
         <div className="flex items-center gap-2 sm:gap-3">
           <button
             onClick={() => {
+              setHeroBgUrlInput(settings.hero_bg_url || '');
+              setHeroBgTypeInput((settings.hero_bg_type as any) || 'video');
+              setHeroBadgeInput(settings.hero_badge || 'DOP • Editor • Colorist');
+              setHeroTitleFirstInput(settings.hero_title_first || 'KSHITIJ');
+              setHeroTitleLastInput(settings.hero_title_last || 'RATHORE');
+              setHeroSubtitleInput(settings.hero_subtitle || 'I shoot stories, shape rhythms, and paint with color.\nThe rest is just export settings.');
+              setHeroTab('content');
+              setIsHeroEditOpen(true);
+            }}
+            className="px-3.5 py-1.5 bg-amber-400 hover:bg-amber-300 text-black rounded-full text-[11px] font-bold uppercase tracking-widest flex items-center gap-1.5 transition-all cursor-pointer shadow-md btn-tactile"
+            title="Edit Hero Headline, Bio, Badge and Background"
+          >
+            <Edit3 size={13} />
+            <span>Edit Hero Content</span>
+          </button>
+
+          <button
+            onClick={() => {
               setEditModalItem(null);
               setIsModalOpen(true);
             }}
@@ -1373,13 +1391,18 @@ export default function AdminPage() {
             onClick={() => {
               setHeroBgUrlInput(settings.hero_bg_url || '');
               setHeroBgTypeInput((settings.hero_bg_type as any) || 'video');
+              setHeroBadgeInput(settings.hero_badge || 'DOP • Editor • Colorist');
+              setHeroTitleFirstInput(settings.hero_title_first || 'KSHITIJ');
+              setHeroTitleLastInput(settings.hero_title_last || 'RATHORE');
+              setHeroSubtitleInput(settings.hero_subtitle || 'I shoot stories, shape rhythms, and paint with color.\nThe rest is just export settings.');
+              setHeroTab('content');
               setIsHeroEditOpen(true);
             }}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-black/75 hover:bg-black text-white border border-white/25 hover:border-white/50 backdrop-blur-xl shadow-2xl transition-all duration-300 text-xs font-bold tracking-wider uppercase cursor-pointer hover:scale-105 active:scale-95"
-            title="Update Hero Background Video/Image"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-black/80 hover:bg-black text-white border border-white/30 hover:border-amber-400/80 backdrop-blur-xl shadow-2xl transition-all duration-300 text-xs font-bold tracking-wider uppercase cursor-pointer hover:scale-105 active:scale-95"
+            title="Edit Hero Headline, Bio, Badge and Background"
           >
             <Edit3 size={14} className="text-amber-400" />
-            <span>Customize Hero BG</span>
+            <span>Edit Hero Content & BG</span>
           </button>
         </div>
 
